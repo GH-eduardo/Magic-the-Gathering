@@ -5,47 +5,46 @@ export type CardDocument = HydratedDocument<Card>;
 
 @Schema()
 export class Card {
+
     @Prop()
-    multiverseId: number;
+    name: String
     
     @Prop()
-    cmc: number;
+    magic_card_id: String
     
     @Prop()
-    Name: string;
+    mana_cost: String
     
     @Prop()
-    ManaCost: string;
+    cmc: Number
     
     @Prop()
-    Set: string;
+    field: String
     
     @Prop()
-    Text: string;
+    oracle_text: String
     
     @Prop()
-    Type: string;
+    power: String
     
     @Prop()
-    Artist: string;
+    toughness: String
     
     @Prop()
-    Number: string;
+    color_identity: String[]
     
     @Prop()
-    Power: string;
+    legal_in_commander: boolean | false
     
     @Prop()
-    Toughness: string;
+    set_name: String
     
     @Prop()
-    Layout: string;
+    rarity: String
     
     @Prop()
-    ImageUrl: string;
+    is_commander :Boolean | false
     
-    @Prop()
-    ExternalId: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);
