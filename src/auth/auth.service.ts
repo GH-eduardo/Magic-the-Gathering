@@ -13,13 +13,13 @@ export class AuthService {
 
     async signIn(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findByEmail(email);
-        if (user?.password !== pass) {
-            throw new UnauthorizedException();
+        if (user?.email !== email) {
+            throw new UnauthorizedException("e-mail not found!");
         }
         
         const passwordMatches = await bcrypt.compare(pass, user.password) 
         if (!passwordMatches) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("password incorrect!");
         }
 
         const payload = { email: user.email }
