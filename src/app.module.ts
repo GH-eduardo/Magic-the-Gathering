@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DecksModule } from './decks/decks.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { env } from 'process';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { UsersModule } from './users/users.module';
       { isGlobal: true }
     ),
     MongooseModule.forRoot(
-      'mongodb://localhost/magic-commander'
+      `mongodb://${env.DATABASE_USER}:${env.DATABASE_PASSWORD}@${env.DATABASE_HOST}:${env.DATABASE_PORT}/`
     ),
     DecksModule,
     AuthModule,
