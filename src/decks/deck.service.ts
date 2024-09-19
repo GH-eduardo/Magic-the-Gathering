@@ -9,25 +9,21 @@ export class DecksService {
     constructor(
         @InjectModel(Deck.name)
         private deckModel: Model<Deck>
-    
-        // @Inject()
-        // private cardService: CardService
     ) { }
 
     async create(createDeckDto: CreateDeckDto): Promise<Deck> {
         const duplicatedDeck = await this.deckModel.findOne({ name: createDeckDto.name });
+        const deckName = createDeckDto.name;
+        const commanderCardId = this.generateCommander(createDeckDto.commanderName);
+        const cardsIds = this.generateCards(commanderCardId);
 
         if (duplicatedDeck) {
             throw new ConflictException("There is already a deck with the same name");
         }
         
-        const createdDeck = new this.deckModel(createDeckDto);
+        const createdDeck = new this.deckModel(deckName, commanderCardId, cardsIds);
         return createdDeck.save();
     }
-
-    // async saveCommanderCard(externalId: string) {
-    //     const existentCard = await 
-    // } 
 
     async findById(id: ObjectId): Promise<Deck> {
         return this.deckModel.findById(id);
@@ -35,5 +31,11 @@ export class DecksService {
 
     async findAll(): Promise<Deck[]> {
         return this.deckModel.find().exec();
+    }
+
+    private async generateCommander(commanderName) {
+    }
+
+    private async generateCards(commanderId) {  
     }
 }
