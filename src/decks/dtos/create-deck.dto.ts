@@ -1,4 +1,5 @@
 export interface CreateDeckDto {
     name: string;
-    commanderId: number;
+    description: string;
+    commanderName: string;
 }

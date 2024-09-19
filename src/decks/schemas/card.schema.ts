@@ -1,51 +1,30 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import { Date, HydratedDocument } from "mongoose";
 
 export type CardDocument = HydratedDocument<Card>;
 
 @Schema()
 export class Card {
-    @Prop()
-    multiverseId: number;
-    
-    @Prop()
-    cmc: number;
-    
-    @Prop()
-    Name: string;
-    
-    @Prop()
-    ManaCost: string;
-    
-    @Prop()
-    Set: string;
-    
-    @Prop()
-    Text: string;
-    
-    @Prop()
-    Type: string;
-    
-    @Prop()
-    Artist: string;
-    
-    @Prop()
-    Number: string;
-    
-    @Prop()
-    Power: string;
-    
-    @Prop()
-    Toughness: string;
-    
-    @Prop()
-    Layout: string;
-    
-    @Prop()
-    ImageUrl: string;
-    
-    @Prop()
-    ExternalId: string;
+    id: string;
+    oracle_id: string;
+    name: string;
+    released_at: Date;
+    uri: string;
+    image_uri: string;
+    mana_cost: string;
+    cmd: number;
+    type_line: string;
+    oracle_text: string;
+    power: string;
+    toughness: string;
+    color_identity: string[];
+    is_commander: boolean;
+    rulings_uri: string;
+    rarity: string;
+    artist: string;
+    artist_ids: string;
+    illustration_id: string;
+    edhrec_url: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

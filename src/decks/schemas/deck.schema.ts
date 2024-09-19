@@ -9,6 +9,9 @@ export class Deck {
     @Prop()
     name: string;
 
+    @Prop()
+    description: string
+
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Card'})
     commander: Card;
 
