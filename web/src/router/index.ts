@@ -1,11 +1,12 @@
-import Decks from '@/pages/Decks.vue'
+import DeckDetails from '@/pages/DeckDetails.vue'
+import DecksOverview from '@/pages/DecksOverview.vue'
 import Home from '@/pages/Home.vue'
 import { createRouter, createWebHistory } from 'vue-router/auto'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { 
+    {
       path: '/',
       name: 'home',
       component: Home,
@@ -13,7 +14,10 @@ const router = createRouter({
     {
       path: '/decks',
       name: 'decks',
-      component: Decks
+      children: [
+        { path: '', component: DecksOverview },
+        { path: ':id', component: DeckDetails }
+      ]
     }
 
   ]

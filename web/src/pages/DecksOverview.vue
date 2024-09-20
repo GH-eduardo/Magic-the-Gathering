@@ -1,5 +1,5 @@
 <script setup>
-import { useDecksStore } from "@/stores/decks.store";
+import { useDecksStore } from "@/stores/decks/decks.store";
 const store = useDecksStore();
 </script>
 
