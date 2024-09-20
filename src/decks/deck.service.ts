@@ -47,8 +47,17 @@ export class DecksService {
     private async generateCommander(commanderName: string): Promise<Card> {
         const url = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(commanderName)}`;
         const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar a carta: ${response.statusText}`);
+        }
+    
         const cardData = await response.json();
 
+        if (cardData.legalities.commander !== 'legal') {
+            throw new Error(`A carta "${commanderName}" não é legal para ser usada como comandante.`);
+        }
+    
         return this.mapToCard(cardData, true);
     }
 
@@ -71,7 +80,8 @@ export class DecksService {
             name: cardData.name,
             released_at: cardData.released_at,
             uri: cardData.uri,
-            image_uri: cardData.image_uris?.normal || '',
+            image_nomral_uri: cardData.image_uris?.normal || '',
+            image_full_uri: cardData.image_uris?.art_crop || '',
             mana_cost: cardData.mana_cost,
             cmd: cardData.cmc,
             type_line: cardData.type_line,
@@ -87,7 +97,7 @@ export class DecksService {
             rulings_uri: cardData.rulings_uri,
             is_commander: isCommander
         });
-
+    
         return card.save();
     }
 }

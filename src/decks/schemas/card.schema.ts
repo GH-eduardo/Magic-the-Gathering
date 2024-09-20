@@ -21,7 +21,10 @@ export class Card {
     uri: string;
 
     @Prop()
-    image_uri: string;
+    image_normal_uri: string;
+
+    @Prop()
+    image_full_uri: string;
 
     @Prop()
     mana_cost: string;
