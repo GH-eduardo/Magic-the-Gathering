@@ -7,10 +7,4 @@ import { Public } from './auth/cross-cutting/decorators/public.decorator';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Public()
-  @Get()
-  getHello(): string {
-    console.log(env);
-    return this.appService.getHello();
-  }
 }
