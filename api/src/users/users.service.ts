@@ -19,7 +19,7 @@ export class UsersService {
             throw new ConflictException();
         }
 
-        const hash = await bcrypt.hash(password, env.BCRYPT_ROUNDS);
+        const hash = await bcrypt.hash(password, Number(env.BCRYPT_ROUNDS));
         
         const createdUser = new this.userModel({ email, password: hash, username });
         return createdUser.save();
