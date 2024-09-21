@@ -1,6 +1,11 @@
+import Auth from '@/pages/Auth.vue'
+import AuthLogin from '@/pages/AuthLogin.vue'
+import AuthRegister from '@/pages/AuthRegister.vue'
+import Cards from '@/pages/Cards.vue'
 import DeckDetails from '@/pages/DeckDetails.vue'
 import DecksOverview from '@/pages/DecksOverview.vue'
 import Home from '@/pages/Home.vue'
+import Main from '@/pages/Main.vue'
 import { createRouter, createWebHistory } from 'vue-router/auto'
 
 const router = createRouter({
@@ -8,20 +13,28 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
-    },
-    {
-      path: '/decks',
-      name: 'decks',
+      component: Main,
       children: [
-        { path: '', component: DecksOverview },
-        { path: ':id', component: DeckDetails }
+        { path: 'home', name: 'home', component: Home },
+        { path: 'decks', name: 'decks', component: DecksOverview },
+        { path: 'decks/:id', component: DeckDetails },
+        { path: 'cards', name: 'cards', component: Cards }
+      ],
+    },
+    { path: '/auth', component: Auth, children: [
+        { path: 'login', name: 'login', component: AuthLogin },
+        { path: 'register', name: 'register', component: AuthRegister }
       ]
     }
 
   ]
 })
+
+router.beforeEach(async (to, from) => {
+  // if (to.path !== '/auth/login') {
+  //   return { path: '/auth/login' }
+  // }
+});
 
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
