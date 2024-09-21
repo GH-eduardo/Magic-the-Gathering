@@ -1,7 +1,12 @@
-import { Bind, Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Bind, Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { DecksService } from './deck.service';
 import { CreateDeckDto } from './dtos/create-deck.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UpdateDeckDto } from './dtos/update-deck.dto';
+import { Deck } from './schemas/deck.schema';
+import { DetailsDeckDto } from './dtos/details-deck.dto';
+import { ListDecksDto } from './dtos/list-decks.dto';
+import { ExportDeckDto } from './dtos/ExportDeckDto.dto';
 
 @ApiBearerAuth()
 @ApiTags('decks')
@@ -9,32 +14,43 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class DecksController {
     constructor(private deckService: DecksService) { }
 
-    // Listar os decks
     @Get()
-    getDecks() {
+    getDecks(): Promise<ListDecksDto[]> {
         return this.deckService.findAll();
     }
 
-    // Mostrar detalhes incluindo dados
-    // Nome, id, ImagemUlr
     @Get(':id')
     @Bind(Param())
-    getDeckById(params) {
+    getDeckById(params): Promise<DetailsDeckDto> {
         return this.deckService.findById(params.id)
     }
-    
-    // Generate Randomly
+
     @Post()
     postDeck(@Body() createDeckDto: CreateDeckDto) {
         return this.deckService.create(createDeckDto);
     }
 
-    // Editar deck (nome, descrição) - Patch
+    @Patch(':id')
+    @Bind(Param(), Body())
+    async updateDeck(params, updateDeckDto: UpdateDeckDto): Promise<Deck> {
+        return this.deckService.updateDeck(params.id, updateDeckDto);
+    }
 
-    // Delete deck
+    @Delete(':id')
+    @Bind(Param('id'))
+    async removeDeck(id: string): Promise<{ message: string }> {
+        await this.deckService.removeDeck(id);
+        return { message: `Deck with ID ${id} successfully removed.` };
+    }
 
-    // Exportar deck
+    @Get(':id/export')
+    @Bind(Param('id'))
+    async exportDeck(id: string): Promise<ExportDeckDto> {
+        return this.deckService.exportDeck(id);
+    }
 
-    // Importar deck
-
+    @Post('import')
+    async importDeck(@Body() importDeckDto: ExportDeckDto): Promise<Deck> {
+        return this.deckService.importDeck(importDeckDto);
+    }
 }
