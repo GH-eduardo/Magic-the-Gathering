@@ -6,46 +6,67 @@ export type CardDocument = HydratedDocument<Card>;
 @Schema()
 export class Card {
     @Prop()
-    multiverseId: number;
-    
+    id: string;
+
     @Prop()
-    cmc: number;
-    
+    oracle_id: string;
+
     @Prop()
-    Name: string;
-    
+    name: string;
+
+    @Prop({ type: Date })
+    released_at: Date;
+
     @Prop()
-    ManaCost: string;
-    
+    uri: string;
+
     @Prop()
-    Set: string;
-    
+    image_normal_uri: string;
+
     @Prop()
-    Text: string;
-    
+    image_full_uri: string;
+
     @Prop()
-    Type: string;
-    
+    mana_cost: string;
+
     @Prop()
-    Artist: string;
-    
+    cmd: number;
+
     @Prop()
-    Number: string;
-    
+    type_line: string;
+
     @Prop()
-    Power: string;
-    
+    oracle_text: string;
+
     @Prop()
-    Toughness: string;
-    
+    power: string;
+
     @Prop()
-    Layout: string;
-    
+    toughness: string;
+
     @Prop()
-    ImageUrl: string;
-    
+    color_identity: [string];
+
     @Prop()
-    ExternalId: string;
+    is_commander: boolean;
+
+    @Prop()
+    rulings_uri: string;
+
+    @Prop()
+    rarity: string;
+
+    @Prop()
+    artist: string;
+
+    @Prop()
+    artist_ids: string;
+
+    @Prop()
+    illustration_id: string;
+
+    @Prop()
+    edhrec_url: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);
