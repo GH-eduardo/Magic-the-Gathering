@@ -6,6 +6,7 @@ import DeckDetails from '@/pages/DeckDetails.vue'
 import DecksOverview from '@/pages/DecksOverview.vue'
 import Home from '@/pages/Home.vue'
 import Main from '@/pages/Main.vue'
+import { useUsersStore } from '@/stores/users/user.store'
 import { createRouter, createWebHistory } from 'vue-router/auto'
 
 const router = createRouter({
@@ -35,9 +36,12 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from) => {
-  // if (to.path !== '/auth/login') {
-  //   return { path: '/auth/login' }
-  // }
+  const userStore = useUsersStore()
+  const publicPaths = ['/auth/login', '/auth/register']
+
+  if (!userStore.isAuthenticated() && !publicPaths.some(path => path === to.path)) {
+    return { path: '/auth/login' }
+  }
 });
 
 router.onError((err, to) => {
