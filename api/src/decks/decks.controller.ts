@@ -1,4 +1,4 @@
-import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res } from '@nestjs/common';
+import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseInterceptors } from '@nestjs/common';
 import { DecksService } from './deck.service';
 import { CreateDeckDto } from './dtos/create-deck.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -8,14 +8,16 @@ import { DetailsDeckDto } from './dtos/details-deck.dto';
 import { ListDecksDto } from './dtos/list-decks.dto';
 import { ExportDeckDto } from './dtos/export-deck.dto';
 import { Request, Response } from 'express';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiBearerAuth()
 @ApiTags('decks')
+@UseInterceptors(CacheInterceptor)
 @Controller('decks')
 export class DecksController {
     constructor(
         private deckService: DecksService) { }
-
+    
     @Get()
     async getDecks(@Req() request: Request): Promise<ListDecksDto[]> {
         return await this.deckService.findAll(request['user'].id);
