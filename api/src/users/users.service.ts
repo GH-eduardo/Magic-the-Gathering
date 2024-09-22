@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { env } from 'process';
@@ -23,5 +23,9 @@ export class UsersService {
         
         const createdUser = new this.userModel({ email, password: hash, username });
         return createdUser.save();
+    }
+
+    async findById(id: ObjectId): Promise<User | undefined> {
+        return await this.userModel.findById(id);
     }
 }

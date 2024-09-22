@@ -1,8 +1,7 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
-import { env } from 'process';
 
 @Injectable()
 export class AuthService {
@@ -21,8 +20,7 @@ export class AuthService {
         if (!passwordMatches) {
             throw new UnauthorizedException("password incorrect!");
         }
-
-        const payload = { email: user.email }
+        const payload = { id: user.id }
 
         return {
             accessToken: await this.jwtService.signAsync(payload)

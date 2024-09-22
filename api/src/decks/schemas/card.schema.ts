@@ -1,12 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
 export type CardDocument = HydratedDocument<Card>;
 
 @Schema()
 export class Card {
-    @Prop()
-    id: string;
+    get id() {
+        return this.id
+    }
 
     @Prop()
     oracle_id: string;

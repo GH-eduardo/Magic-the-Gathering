@@ -5,7 +5,7 @@ Prova prática para a disciplina de Desafio Profissional VI do 6º semestre do c
 Desenvolvido por:
 - **Kauan Muriel Rossi (2214501-2)**
 - **Daniel Bonam Rissardi (22013838-2)**
-- **Eduardo Thomé ()**
+- **Eduardo Thomé (22110037-2)**
 - **Nathan Lisandro Toppa ()**
 
 ## Sumario
@@ -67,11 +67,11 @@ Um dos modos mais jogados no mundo todo é o Commander, também conhecido como E
 Objetivos da Atividade
 
 - Tendo essas informações como base, você deve ler a documentação fornecida, e buscar por 99 cards nessa base de dados para formar o seu baralho.
-Procure primeiro por um comandante, pois ele irá ditar quais cores suas outras 99 cartas poderão ter. Escolhendo o comandante, utilize as informações na doc para buscar outras 99 cartas na base de dados correspondente as cores permitidas, lembrando que você pode repetir somente os terrenos básicos.
-- Após consumir a API e buscar esses dados, salve eles em um arquivo.json.
-- Crie uma rota em sua API para trazer os 100 cards de seu baralho
-- Salve seu deck no banco de dados de sua escolha
-- Criar o sistema de Autenticação para sua API (Só usuários autenticados podem criar e editar seus baralhos)
+Procure primeiro por um comandante, pois ele irá ditar quais cores suas outras 99 cartas poderão ter. Escolhendo o comandante, utilize as informações na doc para buscar outras 99 cartas na base de dados correspondente as cores permitidas, lembrando que você pode repetir somente os terrenos básicos. ✔️
+- Após consumir a API e buscar esses dados, salve eles em um arquivo.json. ✔️
+- Crie uma rota em sua API para trazer os 100 cards de seu baralho ✔️
+- Salve seu deck no banco de dados de sua escolha ✔️
+- Criar o sistema de Autenticação para sua API (Só usuários autenticados podem criar e editar seus baralhos) ✔️
 - Criar o sistema de Autorização
 - Crie os testes automatizados para validar as regras de negócio e o funcionamento de seus endpoints, você pode utilizar mocks para isso.
 - Permita que mais de um baralho seja criado em sua aplicação
