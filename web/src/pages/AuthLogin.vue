@@ -1,17 +1,31 @@
 <script setup lang="ts">
+import router from '@/router';
+import { LoginDto } from '@/stores/users/dto/login.dto';
+import { useUsersStore } from '@/stores/users/user.store';
 import { ref } from 'vue';
 
 const showPassword = ref(false)
+const user = ref({} as LoginDto)
+const userStore = useUsersStore()
+
+async function login() {
+    try {
+        await userStore.login(user.value.email, user.value.password);
+        router.push('/')
+    } catch (error) {
+        console.error(error)
+    }
+}
 </script>
 
 <template>
     <div class="d-flex flex-column w-66 pa-6 ga-5">
         <v-form>
-            <v-text-field label="Email"></v-text-field>
-            <v-text-field :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            <v-text-field v-model="user.email" label="Email"></v-text-field>
+            <v-text-field v-model="user.password" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append-inner="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'"
                 label="Password"></v-text-field>
-            <v-btn class="w-100">Login</v-btn>
+            <v-btn @click.prevent="login" class="w-100">Login</v-btn>
         </v-form>
         <RouterLink to="/auth/register">I don't have an account yet</RouterLink>
     </div>

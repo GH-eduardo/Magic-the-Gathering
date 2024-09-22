@@ -11,7 +11,7 @@ import { env } from 'process';
 @Module({
   imports: [
     ConfigModule.forRoot(
-      { isGlobal: true }
+      { isGlobal: true, envFilePath: '.env.development' }
     ),
     MongooseModule.forRoot(
       `mongodb://${env.DATABASE_USER}:${env.DATABASE_PASSWORD}@${env.DATABASE_HOST}:${env.DATABASE_PORT}/`

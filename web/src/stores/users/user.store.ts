@@ -5,7 +5,7 @@ export const useUsersStore = defineStore('user', () => {
     const user = ref({})
 
     async function login(email: string, password: string) {
-        const response = await fetch("http://localhost:3000/auth/login", {
+        const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -16,7 +16,7 @@ export const useUsersStore = defineStore('user', () => {
     }
 
     async function register(email: string, name: string, password: string) {
-        const response = await fetch("http://localhost:3000/auth/register", {
+        const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/auth/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -24,4 +24,6 @@ export const useUsersStore = defineStore('user', () => {
             body: JSON.stringify({ name, email, password })
         })
     }
+
+    return { register, login }
 })

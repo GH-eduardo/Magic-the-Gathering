@@ -14,6 +14,9 @@ const router = createRouter({
     {
       path: '/',
       component: Main,
+      redirect(to) {
+        return { name: 'home' }
+      },
       children: [
         { path: 'home', name: 'home', component: Home },
         { path: 'decks', name: 'decks', component: DecksOverview },
@@ -21,7 +24,8 @@ const router = createRouter({
         { path: 'cards', name: 'cards', component: Cards }
       ],
     },
-    { path: '/auth', component: Auth, children: [
+    {
+      path: '/auth', component: Auth, children: [
         { path: 'login', name: 'login', component: AuthLogin },
         { path: 'register', name: 'register', component: AuthRegister }
       ]
