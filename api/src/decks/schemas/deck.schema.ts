@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { Card } from "./card.schema";
+import { Card, CardSchema } from "./card.schema";
 
 export type DeckDocument = HydratedDocument<Deck>;
 
@@ -9,10 +9,13 @@ export class Deck {
     @Prop()
     name: string;
 
+    @Prop()
+    description: string
+
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Card'})
     commander: Card;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Card'})
+    @Prop({ type: [CardSchema], default: [] })
     cards: Card[];
 }
 
