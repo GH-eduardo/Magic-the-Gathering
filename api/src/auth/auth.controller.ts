@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './cross-cutting/decorators/public.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 
@@ -12,6 +12,7 @@ export class AuthController {
 
     @Public()
     @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'register a new user' })
     @Post('register')
     register(@Body() registerDto: RegisterDto) {
         return this.authService.register(
@@ -23,6 +24,7 @@ export class AuthController {
 
     @Public()
     @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'login' })
     @Post('login')
     login(@Body() loginDto: LoginDto) {
         return this.authService.signIn(loginDto.email, loginDto.password);
