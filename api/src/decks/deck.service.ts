@@ -81,6 +81,22 @@ export class DecksService {
         }));
     }
 
+    async findAllAdmin(): Promise<ListDecksDto[]> {
+
+        const decks = await this.deckModel.find()
+            .populate('commander')
+            .populate('owner')
+            .exec();
+        
+        return decks.map(deck => ({
+            deckId: deck._id.toString(),
+            name: deck.name,
+            description: deck.description,
+            commanderImage: deck.commander.image_normal_uri || '',
+            owner: deck.owner.username
+        }));
+    }
+
     async updateDeck(id: ObjectId, userId: ObjectId, updateDeckDto: UpdateDeckDto): Promise<void> {
         const deck = await this.findById(id, userId);
         Object.assign(deck, updateDeckDto);

@@ -1,4 +1,4 @@
-import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res } from '@nestjs/common';
+import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { DecksService } from './deck.service';
 import { CreateDeckDto } from './dtos/create-deck.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -8,6 +8,9 @@ import { DetailsDeckDto } from './dtos/details-deck.dto';
 import { ListDecksDto } from './dtos/list-decks.dto';
 import { ExportDeckDto } from './dtos/export-deck.dto';
 import { Request, Response } from 'express';
+import { Roles } from 'src/auth/cross-cutting/decorators/roles.decorator';
+import { Role } from 'src/users/enums/role.enum';
+import { RolesGuard } from 'src/auth/cross-cutting/guards/roles.guard';
 
 @ApiBearerAuth()
 @ApiTags('decks')
@@ -19,6 +22,13 @@ export class DecksController {
     @Get()
     async getDecks(@Req() request: Request): Promise<ListDecksDto[]> {
         return await this.deckService.findAll(request['user'].id);
+    }
+
+    @Get('/admin')
+    @Roles(Role.ADMIN)
+    @UseGuards(RolesGuard)
+    async getAllDecks(): Promise<ListDecksDto[]> {
+        return await this.deckService.findAllAdmin();
     }
 
     @Get(':id')
