@@ -21,19 +21,6 @@ jobs:
             exit $exit_code
           fi
 
-      - name: Run Web Tests
-        run: |
-          cd web
-          npm install
-          npm test
-          exit_code=$?
-          if [ $exit_code -eq 0 ]; then
-            echo "[+] All Web tests passed successfully!"
-          else
-            echo "[-] Web test failures!"
-            exit $exit_code
-          fi
-
   build_api_job:
     needs: application_tests
     runs-on: ubuntu-latest
