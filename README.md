@@ -6,7 +6,7 @@ Desenvolvido por:
 - **Kauan Muriel Rossi (2214501-2)**
 - **Daniel Bonam Rissardi (22013838-2)**
 - **Eduardo Thomé (22110037-2)**
-- **Nathan Lisandro Toppa ()**
+- **Nathan Lisandro Toppa (22019971-2)**
 
 ## Sumario
 
