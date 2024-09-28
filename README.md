@@ -72,10 +72,10 @@ Procure primeiro por um comandante, pois ele irá ditar quais cores suas outras 
 - Crie uma rota em sua API para trazer os 100 cards de seu baralho ✔️
 - Salve seu deck no banco de dados de sua escolha ✔️
 - Criar o sistema de Autenticação para sua API (Só usuários autenticados podem criar e editar seus baralhos) ✔️
-- Criar o sistema de Autorização
+- Criar o sistema de Autorização ✔️
 - Crie os testes automatizados para validar as regras de negócio e o funcionamento de seus endpoints, você pode utilizar mocks para isso.
 - Permita que mais de um baralho seja criado em sua aplicação ✔️
-- Crie uma rota para listar todos os baralhos (somente um usuário com permissão admin pode usar essa rota) 
+- Crie uma rota para listar todos os baralhos (somente um usuário com permissão admin pode usar essa rota) ✔️
 - Crie uma rota para listar somente os baralhos do jogador que está logado ✔️
 - Adicione cacheamento na rota de listar para listar todos os baralhos do jogador logado (Recomendação: https://docs.nestjs.com/techniques/caching) ✔️
 - Crie uma rota onde seja possível "importar" um baralho via json, e valide se esse baralho segue as regras do commander.

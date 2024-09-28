@@ -1,11 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { useDecksStore } from "@/stores/decks/decks.store";
+import { DeckOverview } from "@/stores/decks/dto/deck-overview.dto";
 import { ref } from "vue";
 const store = useDecksStore();
-const decks = ref([])
+const decks = ref([] as DeckOverview[])
 
 async function getDecksOverview() {
   decks.value = await store.getDecksOverview();
+}
+
+async function deleteDeck(id: string) {
+  await store.deleteDeck(id);
+  decks.value = decks.value.filter(deck => deck.deckId != id);
 }
 
 getDecksOverview()
@@ -42,7 +48,7 @@ getDecksOverview()
             </v-tooltip>
             <v-tooltip text="View details" location="top">
               <template v-slot:activator="{ props }">
-                <v-btn icon="mdi-eye" :to="'/decks/' + item.id" v-bind="props"></v-btn>
+                <v-btn icon="mdi-eye" :to="'/decks/' + item.deckId" v-bind="props"></v-btn>
               </template>
             </v-tooltip>
             <v-tooltip text="Edit" location="top">
@@ -52,7 +58,7 @@ getDecksOverview()
             </v-tooltip>
             <v-tooltip text="Delete" location="top">
               <template v-slot:activator="{ props }">
-                <v-btn icon="mdi-delete" v-bind="props"></v-btn>
+                <v-btn icon="mdi-delete" @click="deleteDeck(item.deckId)" v-bind="props"></v-btn>
               </template>
             </v-tooltip>
           </div>

@@ -1,5 +1,5 @@
 export interface DeckOverview {
-    deckId: number
+    deckId: string
     name: string
     description: string,
     commanderImage: string
