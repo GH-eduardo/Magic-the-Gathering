@@ -57,9 +57,15 @@ describe('AuthService', () => {
 
       const result = await service.signIn(email, password);
 
-      expect(result).toEqual({ accessToken });
+      expect(result).toEqual({
+        accessToken,
+        expiresIn: expect.any(Date), 
+        userId: mockUser.id,
+      });
+
+      // Corrigido para verificar a chamada correta do signAsync com expiresIn
+      expect(mockJwtService.signAsync).toHaveBeenCalledWith({ id: mockUser.id, role: undefined }, { expiresIn: '1h' });
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith(email);
-      expect(mockJwtService.signAsync).toHaveBeenCalledWith({ email: mockUser.email });
     });
 
     it('should throw UnauthorizedException if the user is not found', async () => {
@@ -87,14 +93,20 @@ describe('AuthService', () => {
       const email = 'newuser@test.com';
       const username = 'newuser';
       const password = 'password';
-      const createdUser = { id: 2, email, username };
+      const createdUser = { id: 2, email, username: 'newuser', role: 'default' };
 
       mockUsersService.create.mockResolvedValue(createdUser);
 
       const result = await service.register(email, username, password);
 
-      expect(result).toEqual(createdUser);
-      expect(mockUsersService.create).toHaveBeenCalledWith(email, username, password);
+      // Corrigido para refletir o resultado correto da criação do usuário
+      expect(result).toEqual({
+        id: createdUser.id,
+        name: createdUser.username,
+        email: createdUser.email,
+        role: createdUser.role,
+      });
+      expect(mockUsersService.create).toHaveBeenCalledWith(email, username, password, 'default');
     });
 
     it('should throw ConflictException if email is already in use', async () => {

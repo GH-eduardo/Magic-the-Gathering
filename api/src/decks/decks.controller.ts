@@ -8,9 +8,9 @@ import { DetailsDeckDto } from './dtos/details-deck.dto';
 import { ListDecksDto } from './dtos/list-decks.dto';
 import { ExportDeckDto } from './dtos/export-deck.dto';
 import { Request, Response } from 'express';
-import { Roles } from 'src/auth/cross-cutting/decorators/roles.decorator';
-import { Role } from 'src/users/enums/role.enum';
-import { RolesGuard } from 'src/auth/cross-cutting/guards/roles.guard';
+import { Roles } from '../../src/auth/cross-cutting/decorators/roles.decorator';
+import { Role } from '../../src/users/enums/role.enum';
+import { RolesGuard } from '../../src/auth/cross-cutting/guards/roles.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiBearerAuth()
