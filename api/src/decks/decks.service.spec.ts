@@ -4,7 +4,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Deck } from './schemas/deck.schema';
 import { Card } from './schemas/card.schema';
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { Types, Schema } from 'mongoose';  // Usar Types para instanciar ObjectId
+import { Types, Schema } from 'mongoose';
 import fetch from 'node-fetch';
 
 const mockDeckModel = {
@@ -57,7 +57,7 @@ describe('DecksService', () => {
         id: 'test-commander-id',
         name: 'Atraxa, Praetors\' Voice',
         legalities: { commander: 'legal' },
-        image_uris: { normal: 'https://example.com/atraxa.jpg' },
+        image_uris: { normal: 'https://teste.com/atraxa.jpg' },
         color_identity: ['W', 'B', 'G', 'U'],
       };
 
@@ -99,7 +99,7 @@ describe('DecksService', () => {
 
   describe('findById', () => {
     it('should return a deck by id', async () => {
-      const deckId = new Schema.Types.ObjectId("7895ad5c9-7a8s52d-747s40");  // Usar ObjectId
+      const deckId = new Schema.Types.ObjectId("7895ad5c9-7a8s52d-747s40"); 
 
       const mockDeck = {
         _id: deckId,
@@ -107,7 +107,7 @@ describe('DecksService', () => {
         description: 'A test deck',
         commander: {
           name: 'Atraxa, Praetors\' Voice',
-          image_uris: { normal: 'https://example.com/atraxa.jpg' },
+          image_uris: { normal: 'https://teste.com/atraxa.jpg' },
         },
         cards: [],
       };
@@ -119,7 +119,7 @@ describe('DecksService', () => {
       expect(result).toEqual({
         name: 'Atraxa Deck',
         description: 'A test deck',
-        commander: { name: 'Atraxa, Praetors\' Voice', cardImageUri: 'https://example.com/atraxa.jpg', savedCardId: 'undefined' },
+        commander: { name: 'Atraxa, Praetors\' Voice', cardImageUri: 'https://teste.com/atraxa.jpg', savedCardId: 'undefined' },
         cards: [],
       });
     });
@@ -144,7 +144,7 @@ describe('DecksService', () => {
         description: 'Updated description',
         commander: {
           name: 'Atraxa, Praetors\' Voice',
-          image_uris: { normal: 'https://example.com/atraxa.jpg' },
+          image_uris: { normal: 'https://teste.com/atraxa.jpg' },
         },
         cards: [],
       };
