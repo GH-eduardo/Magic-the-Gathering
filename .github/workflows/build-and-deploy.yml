@@ -32,19 +32,8 @@ jobs:
         run: |
           docker build -t magic-the-gathering-api ./api
 
-#  build_web_job:
-#    needs: application_tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        
-#      - name: Build Web Docker Image
-#        run: |
-#          docker build -t magic-the-gathering-web ./web
-
   push_to_dockerhub:
-    needs: [build_api_job, build_web_job]
+    needs: [build_api_job]
     runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
