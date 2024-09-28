@@ -2,11 +2,23 @@
 import router from '@/router';
 import { LoginDto } from '@/stores/users/dto/login.dto';
 import { useUsersStore } from '@/stores/users/user.store';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const showPassword = ref(false)
 const user = ref({} as LoginDto)
 const userStore = useUsersStore()
+const alertMessage = ref(null as any);
+const route = useRoute()
+
+onMounted(() => {
+    if (route.query.type && route.query.message) {
+        alertMessage.value = {
+            type: route.query.type?.toString() || '',
+            message: route.query.message?.toString() || ''
+        }
+    }
+});
 
 async function login() {
     try {
@@ -20,6 +32,9 @@ async function login() {
 
 <template>
     <div class="d-flex flex-column w-66 pa-6 ga-5">
+        <v-alert v-if="alertMessage" :type="alertMessage.type" closable @close="alertMessage = null">
+            {{ alertMessage.message }}
+        </v-alert>
         <v-form>
             <v-text-field v-model="user.email" label="Email"></v-text-field>
             <v-text-field v-model="user.password" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"

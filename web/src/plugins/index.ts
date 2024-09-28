@@ -6,7 +6,7 @@ import { pinia } from './pinia'
 
 export function registerPlugins (app: App) {
   app
-    .use(vuetify)
     .use(pinia)
+    .use(vuetify)
     .use(router)
 }

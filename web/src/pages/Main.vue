@@ -2,7 +2,7 @@
     <v-navigation-drawer>
         <div class="d-flex flex-column justify-center align-center my-10">
             <v-avatar icon="mdi-account"></v-avatar>
-            <p>Hello, John!</p>
+            <p v-if="!loading">Hello, {{ firstName }}!</p>
         </div>
         <v-list-item prepend-icon="mdi-home" title="Home" value="home" to="/home"></v-list-item>
         <v-list-item prepend-icon="mdi-folder" title="Decks" value="decks" to="/decks"></v-list-item>
@@ -14,5 +14,17 @@
 </template>
 
 <script setup lang="ts">
+import { useUsersStore } from '@/stores/users/user.store';
+import { ref } from 'vue';
 
+const userStore = useUsersStore();
+const firstName = ref('');
+const loading = ref(true);
+
+async function fetchUserFirstName() {
+    firstName.value = await userStore.getUserFirstName();
+    loading.value = false;
+}
+
+fetchUserFirstName();
 </script>

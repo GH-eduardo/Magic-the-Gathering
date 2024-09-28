@@ -1,4 +1,4 @@
-import { Bind, Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { DecksService } from './deck.service';
 import { CreateDeckDto } from './dtos/create-deck.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -6,41 +6,55 @@ import { UpdateDeckDto } from './dtos/update-deck.dto';
 import { Deck } from './schemas/deck.schema';
 import { DetailsDeckDto } from './dtos/details-deck.dto';
 import { ListDecksDto } from './dtos/list-decks.dto';
-import { ExportDeckDto } from './dtos/ExportDeckDto.dto';
+import { ExportDeckDto } from './dtos/export-deck.dto';
+import { Request, Response } from 'express';
+import { Roles } from 'src/auth/cross-cutting/decorators/roles.decorator';
+import { Role } from 'src/users/enums/role.enum';
+import { RolesGuard } from 'src/auth/cross-cutting/guards/roles.guard';
 
 @ApiBearerAuth()
 @ApiTags('decks')
 @Controller('decks')
 export class DecksController {
-    constructor(private deckService: DecksService) { }
+    constructor(
+        private deckService: DecksService) { }
 
     @Get()
-    getDecks(): Promise<ListDecksDto[]> {
-        return this.deckService.findAll();
+    async getDecks(@Req() request: Request): Promise<ListDecksDto[]> {
+        return await this.deckService.findAll(request['user'].id);
+    }
+
+    @Get('/admin')
+    @Roles(Role.ADMIN)
+    @UseGuards(RolesGuard)
+    async getAllDecks(): Promise<ListDecksDto[]> {
+        return await this.deckService.findAllAdmin();
     }
 
     @Get(':id')
-    @Bind(Param())
-    getDeckById(params): Promise<DetailsDeckDto> {
-        return this.deckService.findById(params.id)
+    async getDeckById(@Req() request: Request, @Param() params): Promise<DetailsDeckDto> {
+        const deckData = await this.deckService.findById(params.id, request['user'].id);
+        return DetailsDeckDto.fromEntity(deckData);
     }
 
     @Post()
-    postDeck(@Body() createDeckDto: CreateDeckDto) {
-        return this.deckService.create(createDeckDto);
+    async postDeck(@Req() request: Request, @Body() createDeckDto: CreateDeckDto) {
+        const requestUser = request['user'];
+        createDeckDto.ownerId = requestUser.id;
+        return await this.deckService.create(createDeckDto);
     }
 
     @Patch(':id')
-    @Bind(Param(), Body())
-    async updateDeck(params, updateDeckDto: UpdateDeckDto): Promise<Deck> {
-        return this.deckService.updateDeck(params.id, updateDeckDto);
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async updateDeck(@Req() request: Request, @Res() response: Response, @Param() params, @Body() updateDeckDto: UpdateDeckDto): Promise<Response> {
+        await this.deckService.updateDeck(params.id, request['user'].id, updateDeckDto);
+        return response.sendStatus(HttpStatus.NO_CONTENT);
     }
 
     @Delete(':id')
-    @Bind(Param('id'))
-    async removeDeck(id: string): Promise<{ message: string }> {
-        await this.deckService.removeDeck(id);
-        return { message: `Deck with ID ${id} successfully removed.` };
+    async removeDeck(@Req() request: Request, @Param() params): Promise<{ message: string }> {
+        await this.deckService.removeDeck(params.id ,request['user'].id);
+        return { message: `Deck with ID ${params.id} successfully removed.` };
     }
 
     @Get(':id/export')
