@@ -15,24 +15,38 @@ jobs:
           npm install
           npm test
 
-  build_and_push_api:
+  build_and_push_images:
     needs: application_tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Build API Docker Image
       - name: Build API Docker Image
         run: |
           docker build -t magic-the-gathering-api ./api
 
+      # Build Web Docker Image
+      - name: Build Web Docker Image
+        run: |
+          docker build -t magic-the-gathering-web ./web
+
+      # Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      # Push API Docker Image
       - name: Push API Docker Image
         run: |
           docker tag magic-the-gathering-api "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-api"
           docker push "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-api"
+
+      # Push Web Docker Image
+      - name: Push Web Docker Image
+        run: |
+          docker tag magic-the-gathering-web "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-web"
+          docker push "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-web"
