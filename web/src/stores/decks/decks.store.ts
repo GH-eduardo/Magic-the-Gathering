@@ -2,35 +2,28 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { DeckDetails } from './dto/deck-details.dto'
 import { DeckOverview } from './dto/deck-overview.dto'
+import { useUsersStore } from '../users/user.store'
 
 export const useDecksStore = defineStore('decks', () => {
+    const userStore = useUsersStore();
     const decks = ref([
         {
-            id: 2,
+            deckId: 1,
             name: "The best deck in the world!",
             description: "The deck made to do all-win in early game",
-            commander: {
-                image_url: "https://cards.scryfall.io/art_crop/front/0/3/034e0929-b2c7-4b5f-94f2-8eaf4fb1a2a1.jpg?1693611218",
-                name: "Sauron, The Dark Lord"
-            }
+            commanderImage: "https://cards.scryfall.io/art_crop/front/0/3/034e0929-b2c7-4b5f-94f2-8eaf4fb1a2a1.jpg?1693611218"
         },
         {
-            id: 2,
+            deckId: 2,
             name: "Alternative deck",
             description: "The deck made to do all-win in early game with cheap cards",
-            commander: {
-                image_url: "https://cards.scryfall.io/art_crop/front/8/d/8d94b8ec-ecda-43c8-a60e-1ba33e6a54a4.jpg?1562616128",
-                name: "Edgar Markov"
-            }
+            commander: "https://cards.scryfall.io/art_crop/front/8/d/8d94b8ec-ecda-43c8-a60e-1ba33e6a54a4.jpg?1562616128"
         },
         {
-            id: 3,
+            deckId: 3,
             name: "Old best deck",
             description: "The deck made to do survive early game",
-            commander: {
-                image_url: "https://cards.scryfall.io/art_crop/front/e/4/e4b1aa1e-b4e3-4346-8937-76b312501c70.jpg?1673307974",
-                name: "Jodah, the Unifier"
-            }
+            commander: "https://cards.scryfall.io/art_crop/front/e/4/e4b1aa1e-b4e3-4346-8937-76b312501c70.jpg?1673307974"
         }
     ] as DeckOverview[])
     
@@ -68,10 +61,26 @@ export const useDecksStore = defineStore('decks', () => {
         editedAt: new Date().toLocaleDateString()
     } as DeckDetails)
 
-    async function getDeckDetails(id: number): Promise<DeckDetails | null> {
-        // const response = await fetch("http://localhost:3000/decks/" + id)
-        // return await response.json()
-        return deckDetails.value
+    async function getDecksOverview(): Promise<DeckOverview[]> {
+        const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/decks`, {
+            headers: {
+                "Authorization": "Bearer " + userStore.accessToken.token
+            }
+        });
+        const json = await response.json();
+        console.log(json);
+        return json; 
     }
-    return { decks, getDeckDetails }
+
+    async function getDeckDetails(id: number): Promise<DeckDetails | null> {
+        const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/decks/${id}`, {
+            headers: {
+                "Authorization": "Bearer " + userStore.accessToken.token
+            }
+        });
+        const json = await response.json();
+        console.log(json);
+        return json; 
+    }
+    return { getDeckDetails, getDecksOverview }
 })

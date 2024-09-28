@@ -1,6 +1,15 @@
 <script setup>
 import { useDecksStore } from "@/stores/decks/decks.store";
+import { ref } from "vue";
 const store = useDecksStore();
+const decks = ref([])
+
+async function getDecksOverview() {
+  decks.value = await store.getDecksOverview();
+}
+
+getDecksOverview()
+
 </script>
 
 <template>
@@ -10,14 +19,14 @@ const store = useDecksStore();
       <v-btn prepend-icon="mdi-cached">Generate deck</v-btn>
     </div>
     <div class="list-container">
-      <v-list>
+      <v-list v-if="decks.length > 0">
         <div
           class="d-flex justify-space-between align-center pa-2"
-          v-for="item in store.decks"
-          :key="item.id"
+          v-for="item in decks"
+          :key="item.deckId"
         >
           <div class="d-flex align-center ga-5 px-1">
-            <img :src="item.commander.image_url" height="100" />
+            <img :src="item.commanderImage" height="100" />
             <div class="d-flex flex-column align-start flex-start">
               <p>{{ item.name }}</p>
               <p style="opacity: var(--v-medium-emphasis-opacity)">
