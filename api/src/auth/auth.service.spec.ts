@@ -63,7 +63,6 @@ describe('AuthService', () => {
         userId: mockUser.id,
       });
 
-      // Corrigido para verificar a chamada correta do signAsync com expiresIn
       expect(mockJwtService.signAsync).toHaveBeenCalledWith({ id: mockUser.id, role: undefined }, { expiresIn: '1h' });
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith(email);
     });
@@ -99,7 +98,6 @@ describe('AuthService', () => {
 
       const result = await service.register(email, username, password);
 
-      // Corrigido para refletir o resultado correto da criação do usuário
       expect(result).toEqual({
         id: createdUser.id,
         name: createdUser.username,
