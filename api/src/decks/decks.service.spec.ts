@@ -3,225 +3,262 @@ import { DecksService } from './deck.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Deck } from './schemas/deck.schema';
 import { Card } from './schemas/card.schema';
+import { UsersService } from '../../src/users/users.service';
+import mongoose, { Model } from 'mongoose';
+import { CreateDeckDto } from './dtos/create-deck.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { Types, Schema } from 'mongoose';
-import fetch from 'node-fetch';
-
-const mockDeckModel = {
-  findOne: jest.fn(),
-  findById: jest.fn(),
-  find: jest.fn(),
-  create: jest.fn(),
-  save: jest.fn(),
-  findByIdAndUpdate: jest.fn(),
-  findByIdAndDelete: jest.fn(),
-};
-
-const mockCardModel = {
-  findOne: jest.fn(),
-  find: jest.fn(),
-  create: jest.fn(),
-  save: jest.fn(),
-};
+import { Role } from '../../src/users/enums/role.enum';
+import { UpdateDeckDto } from './dtos/update-deck.dto';
+import { ExportDeckDto } from './dtos/export-deck.dto';
 
 describe('DecksService', () => {
   let service: DecksService;
+  let deckModel: Model<Deck>;
+  let cardModel: Model<Card>;
+  let usersService: UsersService;
+
+  const mockDeckModel = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    findById: jest.fn(),
+    find: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
+    deleteOne: jest.fn(),
+  };
+
+  const mockCardModel = {
+    findOne: jest.fn(),
+    find: jest.fn(),
+    create: jest.fn(),
+  };
+
+  const mockUsersService = {
+    findById: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DecksService,
-        { provide: getModelToken(Deck.name), useValue: mockDeckModel },
-        { provide: getModelToken(Card.name), useValue: mockCardModel },
+        {
+          provide: getModelToken(Deck.name),
+          useValue: mockDeckModel,
+        },
+        {
+          provide: getModelToken(Card.name),
+          useValue: mockCardModel,
+        },
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
       ],
     }).compile();
 
     service = module.get<DecksService>(DecksService);
+    deckModel = module.get<Model<Deck>>(getModelToken(Deck.name));
+    cardModel = module.get<Model<Card>>(getModelToken(Card.name));
+    usersService = module.get<UsersService>(UsersService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('create', () => {
-    it('should create a new deck with real data from Scryfall API', async () => {
-      const createDeckDto = {
-        name: 'Atraxa Deck',
-        description: 'A deck for testing',
-        commanderName: 'Atraxa, Praetors\' Voice',
+    it('should throw ConflictException if deck name already exists', async () => {
+      const createDeckDto: CreateDeckDto = {
+        name: 'Existing Deck',
+        description: 'Test Description',
+        commanderName: 'Test Commander',
+        ownerId: new mongoose.Types.ObjectId() as any,
       };
 
-      mockDeckModel.findOne.mockResolvedValue(null);
-
-      const commanderData = {
-        id: 'test-commander-id',
-        name: 'Atraxa, Praetors\' Voice',
-        legalities: { commander: 'legal' },
-        image_uris: { normal: 'https://teste.com/atraxa.jpg' },
-        color_identity: ['W', 'B', 'G', 'U'],
-      };
-
-      jest.spyOn(global, 'fetch').mockResolvedValueOnce({
-        ok: true,
-        json: async () => commanderData,
-      } as any);
-
-      const savedDeck = {
-        _id: "7895ad5c9-7a8s52d-747s40",
-        name: 'Atraxa Deck',
-        description: 'A deck for testing',
-        commander: commanderData,
-        cards: [],
-      };
-
-      mockDeckModel.create.mockReturnValue(savedDeck);
-      mockDeckModel.save.mockResolvedValue(savedDeck);
-
-      const result = await service.create(createDeckDto);
-
-      expect(result).toEqual({ message: 'Deck created successfully', deckId: savedDeck._id.toString() });
-      expect(mockDeckModel.findOne).toHaveBeenCalledWith({ name: createDeckDto.name });
-      expect(mockDeckModel.create).toHaveBeenCalled();
-    });
-
-    it('should throw ConflictException if the deck name already exists', async () => {
-      const createDeckDto = {
-        name: 'Atraxa Deck',
-        description: 'A deck for testing',
-        commanderName: 'Atraxa, Praetors\' Voice',
-      };
-
-      mockDeckModel.findOne.mockResolvedValue({ name: 'Atraxa Deck' });
+      mockDeckModel.findOne.mockReturnValue({ name: 'Existing Deck' });
 
       await expect(service.create(createDeckDto)).rejects.toThrow(ConflictException);
+      expect(mockDeckModel.findOne).toHaveBeenCalledWith({ name: createDeckDto.name });
     });
   });
 
   describe('findById', () => {
-    it('should return a deck by id', async () => {
-      const deckId = new Schema.Types.ObjectId("7895ad5c9-7a8s52d-747s40"); 
+    it('should return a deck if found', async () => {
+      const deckId = new mongoose.Types.ObjectId() as any;
+      const userId = new mongoose.Types.ObjectId() as any;
+      const user = { id: userId, role: Role.DEFAULT };
+      const deck = { _id: deckId, owner: userId };
 
-      const mockDeck = {
-        _id: deckId,
-        name: 'Atraxa Deck',
-        description: 'A test deck',
-        commander: {
-          name: 'Atraxa, Praetors\' Voice',
-          image_uris: { normal: 'https://teste.com/atraxa.jpg' },
-        },
-        cards: [],
-      };
-
-      mockDeckModel.findById.mockResolvedValue(mockDeck);
-
-      const result = await service.findById(deckId);
-
-      expect(result).toEqual({
-        name: 'Atraxa Deck',
-        description: 'A test deck',
-        commander: { name: 'Atraxa, Praetors\' Voice', cardImageUri: 'https://teste.com/atraxa.jpg', savedCardId: 'undefined' },
-        cards: [],
+      mockUsersService.findById.mockResolvedValue(user);
+      mockDeckModel.findById.mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(deck),
       });
+
+      const result = await service.findById(deckId, userId);
+
+      expect(result).toEqual(deck);
+      expect(mockUsersService.findById).toHaveBeenCalledWith(userId);
+      expect(mockDeckModel.findById).toHaveBeenCalledWith(deckId);
     });
 
-    it('should throw NotFoundException if the deck is not found', async () => {
-        const deckId = new Schema.Types.ObjectId("7895ad5c9-7a8s52d-747s40");
+    it('should throw NotFoundException if deck not found', async () => {
+      const deckId = new mongoose.Types.ObjectId() as any;
+      const userId = new mongoose.Types.ObjectId() as any;
+      const user = { id: userId, role: Role.DEFAULT };
 
-      mockDeckModel.findById.mockResolvedValue(null);
+      mockUsersService.findById.mockResolvedValue(user);
+      mockDeckModel.findById.mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(null),
+      });
 
-      await expect(service.findById(deckId)).rejects.toThrow(NotFoundException);
+      await expect(service.findById(deckId, userId)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return a list of decks for a user', async () => {
+      const userId = new mongoose.Types.ObjectId() as any;
+      const user = { id: userId };
+      const decks = [
+        {
+          _id: new mongoose.Types.ObjectId(),
+          name: 'Deck 1',
+          description: 'Description 1',
+          commander: { image_normal_uri: 'image1.jpg' },
+        },
+      ];
+
+      mockUsersService.findById.mockResolvedValue(user);
+      mockDeckModel.find.mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(decks),
+      });
+
+      const result = await service.findAll(userId);
+
+      expect(result).toEqual([
+        {
+          deckId: decks[0]._id.toString(),
+          name: decks[0].name,
+          description: decks[0].description,
+          commanderImage: 'image1.jpg',
+        },
+      ]);
+      expect(mockDeckModel.find).toHaveBeenCalled();
     });
   });
 
   describe('updateDeck', () => {
-    it('should update and return a deck', async () => {
-        const deckId = new Schema.Types.ObjectId("7895ad5c9-7a8s52d-747s40");
-        const updateDeckDto = { name: 'Updated Deck Name' };
-
-      const updatedDeck = {
-        _id: deckId,
+    it('should update a deck', async () => {
+      const deckId = new mongoose.Types.ObjectId() as any;
+      const userId = new mongoose.Types.ObjectId() as any;
+      const updateDeckDto: UpdateDeckDto = {
         name: 'Updated Deck Name',
-        description: 'Updated description',
-        commander: {
-          name: 'Atraxa, Praetors\' Voice',
-          image_uris: { normal: 'https://teste.com/atraxa.jpg' },
-        },
-        cards: [],
+        description: 'Updated Description',
       };
+      const deck = { _id: deckId, owner: userId };
 
-      mockDeckModel.findByIdAndUpdate.mockResolvedValue(updatedDeck);
+      service.findById = jest.fn().mockResolvedValue(deck);
+      mockDeckModel.findByIdAndUpdate.mockResolvedValue({});
 
-      const result = await service.updateDeck(deckId, updateDeckDto);
+      await service.updateDeck(deckId, userId, updateDeckDto);
 
-      expect(result).toEqual(updatedDeck);
-    });
-
-    it('should throw NotFoundException if the deck to update is not found', async () => {
-        const deckId = new Schema.Types.ObjectId("7895ad5c9-7a8s52d-747s40"); 
-        const updateDeckDto = { name: 'Updated Deck Name' };
-
-      mockDeckModel.findByIdAndUpdate.mockResolvedValue(null);
-
-      await expect(service.updateDeck(deckId, updateDeckDto)).rejects.toThrow(NotFoundException);
+      expect(service.findById).toHaveBeenCalledWith(deckId, userId);
+      expect(mockDeckModel.findByIdAndUpdate).toHaveBeenCalledWith(deckId, {
+        ...deck,
+        ...updateDeckDto,
+      });
     });
   });
 
   describe('removeDeck', () => {
-    it('should delete a deck', async () => {
-      const deckId = new Types.ObjectId(); 
+    it('should remove a deck', async () => {
+      const deckId = new mongoose.Types.ObjectId() as any;
+      const userId = new mongoose.Types.ObjectId() as any;
+      const deck = { _id: deckId, owner: userId, id: deckId };
 
-      mockDeckModel.findByIdAndDelete.mockResolvedValue({ _id: deckId });
+      service.findById = jest.fn().mockResolvedValue(deck);
+      mockDeckModel.deleteOne.mockResolvedValue({ deletedCount: 1 });
 
-      await service.removeDeck(deckId.toString());
+      await service.removeDeck(deckId, userId);
 
-      expect(mockDeckModel.findByIdAndDelete).toHaveBeenCalledWith(deckId.toString());
-    });
-
-    it('should throw NotFoundException if the deck to delete is not found', async () => {
-      const deckId = new Types.ObjectId();  
-
-      mockDeckModel.findByIdAndDelete.mockResolvedValue(null);
-
-      await expect(service.removeDeck(deckId.toString())).rejects.toThrow(NotFoundException);
+      expect(service.findById).toHaveBeenCalledWith(deckId, userId);
+      expect(mockDeckModel.deleteOne).toHaveBeenCalledWith({ _id: deckId });
     });
   });
 
   describe('exportDeck', () => {
     it('should export a deck', async () => {
-      const deckId = new Types.ObjectId();  
-
-      const mockDeck = {
-        _id: deckId,
-        name: 'Atraxa Deck',
-        description: 'A test deck',
-        commander: {
-          id: 'test-commander-id',
-          name: 'Atraxa, Praetors\' Voice',
-        },
-        cards: [
-          { id: 'card-1', name: 'Card 1' },
-          { id: 'card-2', name: 'Card 2' },
-        ],
+      const deckId = 'deckId';
+      const deck = {
+        name: 'Deck Name',
+        description: 'Deck Description',
+        commander: { id: 'commanderId' },
+        cards: [{ id: 'card1' }, { id: 'card2' }],
       };
 
-      mockDeckModel.findById.mockResolvedValue(mockDeck);
+      mockDeckModel.findById.mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(deck),
+      });
 
-      const result = await service.exportDeck(deckId.toString());
+      const result = await service.exportDeck(deckId);
 
       expect(result).toEqual({
-        name: 'Atraxa Deck',
-        description: 'A test deck',
-        commanderId: 'test-commander-id',
-        cardsIds: ['card-1', 'card-2'],
+        name: deck.name,
+        description: deck.description,
+        commanderId: 'commanderId',
+        cardsIds: ['card1', 'card2'],
       });
+      expect(mockDeckModel.findById).toHaveBeenCalledWith(deckId);
     });
 
-    it('should throw NotFoundException if the deck to export is not found', async () => {
-      const deckId = new Types.ObjectId(); 
+    it('should throw NotFoundException if deck not found', async () => {
+      const deckId = 'deckId';
 
-      mockDeckModel.findById.mockResolvedValue(null);
+      mockDeckModel.findById.mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(null),
+      });
 
-      await expect(service.exportDeck(deckId.toString())).rejects.toThrow(NotFoundException);
+      await expect(service.exportDeck(deckId)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('importDeck', () => {
+
+    it('should throw NotFoundException if commander not found', async () => {
+      const importDeckDto: ExportDeckDto = {
+        name: 'Imported Deck',
+        description: 'Imported Description',
+        commanderId: 'invalidCommanderId',
+        cardsIds: ['card1', 'card2'],
+      };
+
+      mockCardModel.findOne.mockResolvedValue(null);
+
+      await expect(service.importDeck(importDeckDto)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException if some cards not found', async () => {
+      const importDeckDto: ExportDeckDto = {
+        name: 'Imported Deck',
+        description: 'Imported Description',
+        commanderId: 'commanderId',
+        cardsIds: ['card1', 'card2'],
+      };
+
+      const commander = { id: 'commanderId' };
+      const cards = [{ id: 'card1' }];
+
+      mockCardModel.findOne.mockResolvedValue(commander);
+      mockCardModel.find.mockResolvedValue(cards);
+
+      await expect(service.importDeck(importDeckDto)).rejects.toThrow(NotFoundException);
     });
   });
 });
