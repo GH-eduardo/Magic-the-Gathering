@@ -6,6 +6,7 @@ import { CreateDeckDto } from "./dtos/create-deck.dto";
 import { UpdateDeckDto } from "./dtos/update-deck.dto";
 import { Card } from './schemas/card.schema';
 import { ListDecksDto } from "./dtos/list-decks.dto";
+import { ImportDeckDto } from "./dtos/import-deck.dto";
 import { ExportDeckDto } from "./dtos/export-deck.dto";
 import fetch from 'node-fetch';
 import { UsersService } from "src/users/users.service";
@@ -124,25 +125,29 @@ export class DecksService {
         };
     }
 
-    async importDeck(importDeckDto: ExportDeckDto): Promise<Deck> {
+    async importDeck(importDeckDto: ImportDeckDto): Promise<Deck> {
         const { name, description, commanderId, cardsIds } = importDeckDto;
+        console.log(name, description, commanderId, cardsIds)
 
-        const commander = await this.cardModel.findOne({ id: commanderId });
+        const commander = await this.cardModel.findOne({ _id: commanderId });
         if (!commander) {
             throw new NotFoundException(`Commander with ID ${commanderId} not found.`);
         }
 
-        const cards = await this.cardModel.find({ id: { $in: cardsIds } });
+        const cards = await this.cardModel.find({ _id: { $in: cardsIds } });
 
         if (cards.length !== cardsIds.length) {
             throw new NotFoundException(`Some cards with the provided IDs were not found.`);
         }
 
+        const owner = importDeckDto.ownerId;
+
         const importedDeck = new this.deckModel({
             name,
             description,
             commander,
-            cards
+            cards,
+            owner
         });
 
         return importedDeck.save();
