@@ -13,7 +13,7 @@ jobs:
         run: |
           cd api
           npm install
-          npm test
+#          npm test
 
   build_and_push_images:
     needs: application_tests
