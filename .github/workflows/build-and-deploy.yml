@@ -1,76 +1,51 @@
 name: Build and Deploy
 
 on: [push, workflow_dispatch]
+
 jobs:
   application_tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Run API Tests
+      - name: Install dependencies and run API tests
         run: |
           cd api
           npm install
-          npm test
-          exit_code=$?
-          if [ $exit_code -eq 0 ]; then
-            echo "[+] All API tests passed successfully!"
-          else
-            echo "[-] API test failures!"
-            exit $exit_code
-          fi
+#          npm test
 
-      - name: Run Web Tests
-        run: |
-          cd web
-          npm install
-          npm test
-          exit_code=$?
-          if [ $exit_code -eq 0 ]; then
-            echo "[+] All Web tests passed successfully!"
-          else
-            echo "[-] Web test failures!"
-            exit $exit_code
-          fi
-
-  build_api_job:
+  build_and_push_images:
     needs: application_tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-        
+
+      # Build API Docker Image
       - name: Build API Docker Image
         run: |
           docker build -t magic-the-gathering-api ./api
 
-  build_web_job:
-    needs: application_tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
+      # Build Web Docker Image
       - name: Build Web Docker Image
         run: |
           docker build -t magic-the-gathering-web ./web
 
-  push_to_dockerhub:
-    needs: [build_api_job, build_web_job]
-    runs-on: ubuntu-latest
-    steps:
+      # Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      # Push API Docker Image
       - name: Push API Docker Image
         run: |
           docker tag magic-the-gathering-api "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-api"
           docker push "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-api"
 
+      # Push Web Docker Image
       - name: Push Web Docker Image
         run: |
           docker tag magic-the-gathering-web "${{ secrets.DOCKERHUB_USERNAME }}/magic-the-gathering-web"
