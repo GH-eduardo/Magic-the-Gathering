@@ -5,7 +5,7 @@ export class CreateDeckDto {
 
     @ApiProperty({
         description: 'name/title of the deck',
-        example: 'deck da Gisa',
+        example: 'deck da Dina',
     })
     name: string;
 

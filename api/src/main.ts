@@ -15,6 +15,7 @@ async function bootstrap() {
     .setTitle('Magic Commander Decks')
     .setDescription('The magic commander decks manager')
     .setVersion('1.0')
+    .addTag('auth')
     .addTag('decks')
     .addBearerAuth()
     .build();

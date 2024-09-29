@@ -6,6 +6,7 @@ import { UpdateDeckDto } from './dtos/update-deck.dto';
 import { Deck } from './schemas/deck.schema';
 import { DetailsDeckDto } from './dtos/details-deck.dto';
 import { ListDecksDto } from './dtos/list-decks.dto';
+import { ImportDeckDto } from './dtos/import-deck.dto';
 import { ExportDeckDto } from './dtos/export-deck.dto';
 import { Request, Response } from 'express';
 import { Roles } from '../../src/auth/cross-cutting/decorators/roles.decorator';
@@ -77,34 +78,11 @@ export class DecksController {
     }
 
     @ApiOperation({ summary: 'import deck by providing a json object' })
-    @ApiBody({
-        description: 'provide below the deck json object',
-        schema: {
-            example: {
-                name: 'deck de Dina',
-                description: 'deck de controle',
-                commander: {
-                    id: '5f9d7b3b9f6b6b001f3b3b3b',
-                    name: 'Dina, Soul Steeper',
-                    imageUri: 'https://cards.scryfall.io/normal/front/9/c/9cd2b567-0cf7-4441-b3ce-e31141dd91c8.jpg?1627428607'
-                },
-                cards: [
-                    {
-                        id: '66f4297e6a60bacc2c64c007',
-                        name: 'Abomination of Gudul',
-                        imageUri: 'https://cards.scryfall.io/normal/front/7/d/7df9759e-1072-4a6a-be57-f73b15bf3847.jpg?1562789157'
-                    },
-                    {
-                        id: '66f4297e6a60bacc2c64c009',
-                        name: 'Abomination of Llanowar',
-                        imageUri: 'https://cards.scryfall.io/normal/front/4/b/4b68bc46-5591-44dd-becc-eca154066925.jpg?1631235320'
-                    }
-                ]
-            }
-        }
-    })
     @Post('import')
-    async importDeck(@Body() importDeckDto: ExportDeckDto): Promise<Deck> {
+    async importDeck(@Req() request: Request, @Body() importDeckDto: ImportDeckDto): Promise<Deck> {
+        const requestUser = request['user'];
+        importDeckDto.ownerId = requestUser.id;
+
         return this.deckService.importDeck(importDeckDto);
     }
 }
