@@ -1,7 +1,7 @@
 import { DeckCommanderInfo } from "./deck-commander.dto";
 
 export interface DeckDetails {
-    id: number,
+    id: string,
     name: string,
     description: string,
     commander: DeckCommanderInfo,

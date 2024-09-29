@@ -1,11 +1,20 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { AccessToken } from "./dto/access-token.dto";
 import { UserData } from "./dto/user-data.dto";
 
 export const useUsersStore = defineStore('user', () => {
     const user = ref({} as UserData)
     const accessToken = ref({} as AccessToken)
+
+    const savedToken = localStorage.getItem('accessToken');
+    const savedExpiresIn = localStorage.getItem('expiresIn');
+    const userId = localStorage.getItem('userId');
+    if (savedToken && savedExpiresIn && userId) {
+        accessToken.value.token = savedToken;
+        accessToken.value.expiresIn = new Date(savedExpiresIn);
+        user.value.id = userId;
+    }
 
     async function login(email: string, password: string) {
         const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/auth/login`, {
@@ -19,10 +28,14 @@ export const useUsersStore = defineStore('user', () => {
         user.value.id = json.userId
         accessToken.value.token = json.accessToken
         accessToken.value.expiresIn = json.expiresIn
+
+        localStorage.setItem('userId' ,json.userId);
+        localStorage.setItem('accessToken', json.accessToken);
+        localStorage.setItem('expiresIn', json.expiresIn);
     }
 
     async function register(username: string, email: string, password: string) {
-        const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/auth/register`, {
+        await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/auth/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -31,12 +44,20 @@ export const useUsersStore = defineStore('user', () => {
         })
     }
 
+    function logout() {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('expiresIn');
+        user.value = {} as UserData;
+        accessToken.value = {} as AccessToken;
+    }
+
     async function getUserInformation() {
-        console.log("USER - " + user.value.id)
         if (!user.value.name) {
-            const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/users/${user.value.id}`, { headers: {
-                "Authorization": "Bearer " + accessToken.value.token
-            }});
+            const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/users/${user.value.id}`, {
+                headers: {
+                    "Authorization": "Bearer " + accessToken.value.token
+                }
+            });
             const json = await response.json();
             user.value.name = json.name
             user.value.email = json.email
@@ -57,5 +78,5 @@ export const useUsersStore = defineStore('user', () => {
         return true;
     }
 
-    return { register, login, getUserInformation, getUserFirstName, isAuthenticated }
+    return { register, login, logout, getUserInformation, getUserFirstName, isAuthenticated, accessToken }
 })

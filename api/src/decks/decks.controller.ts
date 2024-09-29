@@ -57,6 +57,7 @@ export class DecksController {
     @ApiParam({ name: 'id', description: 'deck id', example: '5f9d7b3b9f6b6b001f3b3b3b' })
     @Patch(':id')
     async updateDeck(@Req() request: Request, @Res() response: Response, @Param() params, @Body() updateDeckDto: UpdateDeckDto): Promise<Response> {
+        console.log(updateDeckDto)
         await this.deckService.updateDeck(params.id, request['user'].id, updateDeckDto);
         return response.sendStatus(HttpStatus.NO_CONTENT);
     }

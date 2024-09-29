@@ -1,4 +1,4 @@
 export interface DeckCommanderInfo {
-    image_url: string,
+    imageUri: string,
     name: string
 }

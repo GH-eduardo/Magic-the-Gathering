@@ -100,7 +100,8 @@ export class DecksService {
 
     async updateDeck(id: ObjectId, userId: ObjectId, updateDeckDto: UpdateDeckDto): Promise<void> {
         const deck = await this.findById(id, userId);
-        Object.assign(deck, updateDeckDto);
+        deck.name = updateDeckDto.name;
+        deck.description = updateDeckDto.description;
         await this.deckModel.findByIdAndUpdate(id, deck);
     }
 

@@ -2,6 +2,7 @@ import { Deck } from "../schemas/deck.schema";
 import { BasicCardDto } from "./basic-card.dto";
 
 export class DetailsDeckDto {
+    id: string;
     name: string;
     description: string;
     commander: BasicCardDto;
@@ -9,6 +10,7 @@ export class DetailsDeckDto {
 
     static fromEntity(deck: Deck): DetailsDeckDto {
         return {
+            id: deck.id,
             name: deck.name,
             description: deck.description,
             commander: BasicCardDto.fromEntity(deck.commander),
