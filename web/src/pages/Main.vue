@@ -6,7 +6,7 @@
         </div>
         <v-list-item prepend-icon="mdi-home" title="Home" value="home" to="/home"></v-list-item>
         <v-list-item prepend-icon="mdi-folder" title="Decks" value="decks" to="/decks"></v-list-item>
-        <v-list-item prepend-icon="mdi-cards" title="Cards" value="cards" to="/cards"></v-list-item>
+        <v-list-item prepend-icon="mdi-logout" title="Logout" value="cards" class="mb-0" to="/auth/login"></v-list-item>
     </v-navigation-drawer>
     <v-main class="d-flex justify-center align-start ma-6">
         <router-view></router-view>

@@ -14,15 +14,18 @@ const deckDetails = ref({} as DeckDetails | null)
 watch(() => route.params.id, fetchDeck, { immediate: true })
 
 async function fetchDeck(id: string | string[]) {
-    error.value = deckDetails.value = null
-    loading.value = true
+    if (typeof id === 'string') {
+        error.value = deckDetails.value = null
+        loading.value = true
 
-    try {
-        deckDetails.value = await decksStore.getDeckDetails(Number(id));
-    } catch (err: any) {
-        error.value = err.toString()
-    } finally {
-        loading.value = false
+        try {
+            deckDetails.value = await decksStore.getDeckDetails(id);
+            console.log(deckDetails.value)
+        } catch (err: any) {
+            error.value = err.toString()
+        } finally {
+            loading.value = false
+        }
     }
 }
 </script>
@@ -36,12 +39,11 @@ async function fetchDeck(id: string | string[]) {
         </div>
         <v-sheet class="d-flex pa-4 ga-4" rounded>
             <div class="d-flex flex-column ga-2">
-                <img :src="deckDetails?.commander.image_url" height="400" />
+                <img :src="deckDetails?.commander.imageUri" height="400" />
                 <p style="text-align: center;">{{ deckDetails?.commander.name }}</p>
             </div>
             <v-form readonly class="w-100">
-                <v-text-field label="Name" dense variant="solo-filled"
-                    :model-value="deckDetails?.name"></v-text-field>
+                <v-text-field label="Name" dense variant="solo-filled" :model-value="deckDetails?.name"></v-text-field>
                 <v-textarea label="Description" variant="solo-filled"
                     :model-value="deckDetails?.description"></v-textarea>
                 <div class="d-flex ga-4">
@@ -59,7 +61,7 @@ async function fetchDeck(id: string | string[]) {
         <div class="d-flex ga-4 flex-wrap">
             <RouterLink v-for="card in deckDetails?.cards" :key="card.id" :to="'/cards/' + card.id">
                 <v-sheet rounded class="card-container d-flex flex-column">
-                    <img :src="card.image_url" height="400" />
+                    <img :src="card.imageUri" height="400" />
                     <p style="text-align: center;">{{ card.name }}</p>
                 </v-sheet>
             </RouterLink>
@@ -75,5 +77,4 @@ a {
 .card-container:hover {
     background-color: rgba(45, 45, 45, 1);
 }
-
 </style>

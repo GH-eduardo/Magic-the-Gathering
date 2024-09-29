@@ -14,6 +14,17 @@ async function deleteDeck(id: string) {
   decks.value = decks.value.filter(deck => deck.deckId != id);
 }
 
+async function exportDeck(id: string) {
+  const response = await store.exportDeck(id);
+  const blob = new Blob([JSON.stringify(response)], { type: "application/json" })
+  const tempUrl = URL.createObjectURL(blob);
+  const anchorElement = document.createElement('a');
+  anchorElement.href = tempUrl;
+  anchorElement.download = response.name + ".json";
+  anchorElement.click();
+  URL.revokeObjectURL(tempUrl);
+}
+
 getDecksOverview()
 
 </script>
@@ -26,11 +37,7 @@ getDecksOverview()
     </div>
     <div class="list-container">
       <v-list v-if="decks.length > 0">
-        <div
-          class="d-flex justify-space-between align-center pa-2"
-          v-for="item in decks"
-          :key="item.deckId"
-        >
+        <div class="d-flex justify-space-between align-center pa-2" v-for="item in decks" :key="item.deckId">
           <div class="d-flex align-center ga-5 px-1">
             <img :src="item.commanderImage" height="100" />
             <div class="d-flex flex-column align-start flex-start">
@@ -43,7 +50,7 @@ getDecksOverview()
           <div class="d-flex ga-1">
             <v-tooltip text="Export" location="top">
               <template v-slot:activator="{ props }">
-                <v-btn icon="mdi-download" v-bind="props"></v-btn>
+                <v-btn icon="mdi-download" @click="exportDeck(item.deckId)" v-bind="props"></v-btn>
               </template>
             </v-tooltip>
             <v-tooltip text="View details" location="top">
