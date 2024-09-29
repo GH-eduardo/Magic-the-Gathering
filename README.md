@@ -73,7 +73,7 @@ Procure primeiro por um comandante, pois ele irá ditar quais cores suas outras 
 - Salve seu deck no banco de dados de sua escolha ✔️
 - Criar o sistema de Autenticação para sua API (Só usuários autenticados podem criar e editar seus baralhos) ✔️
 - Criar o sistema de Autorização ✔️
-- Crie os testes automatizados para validar as regras de negócio e o funcionamento de seus endpoints, você pode utilizar mocks para isso.
+- Crie os testes automatizados para validar as regras de negócio e o funcionamento de seus endpoints, você pode utilizar mocks para isso. ✔️
 - Permita que mais de um baralho seja criado em sua aplicação ✔️
 - Crie uma rota para listar todos os baralhos (somente um usuário com permissão admin pode usar essa rota) ✔️
 - Crie uma rota para listar somente os baralhos do jogador que está logado ✔️
