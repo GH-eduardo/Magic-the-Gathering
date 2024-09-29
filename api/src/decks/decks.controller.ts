@@ -9,10 +9,10 @@ import { ListDecksDto } from './dtos/list-decks.dto';
 import { ImportDeckDto } from './dtos/import-deck.dto';
 import { ExportDeckDto } from './dtos/export-deck.dto';
 import { Request, Response } from 'express';
-import { Roles } from '../../src/auth/cross-cutting/decorators/roles.decorator';
-import { Role } from '../../src/users/enums/role.enum';
-import { RolesGuard } from '../../src/auth/cross-cutting/guards/roles.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { Roles } from 'src/auth/cross-cutting/decorators/roles.decorator';
+import { Role } from 'src/users/enums/role.enum';
+import { RolesGuard } from 'src/auth/cross-cutting/guards/roles.guard';
 
 @ApiBearerAuth()
 @ApiTags('decks')

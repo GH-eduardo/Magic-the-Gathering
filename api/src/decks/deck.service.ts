@@ -9,8 +9,8 @@ import { ListDecksDto } from "./dtos/list-decks.dto";
 import { ImportDeckDto } from "./dtos/import-deck.dto";
 import { ExportDeckDto } from "./dtos/export-deck.dto";
 import fetch from 'node-fetch';
-import { UsersService } from "../../src/users/users.service";
-import { Role } from "../../src/users/enums/role.enum";
+import { UsersService } from "src/users/users.service";
+import { Role } from "src/users/enums/role.enum";
 
 @Injectable()
 export class DecksService {
