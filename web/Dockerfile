@@ -20,7 +20,7 @@ ENV VITE_SERVER_HOST=localhost
 ENV VITE_SERVER_PORT=8080
 
 # Expondo a porta que a aplicação vai rodar
-EXPOSE 3000  # Ajuste conforme a porta que seu app usa
+EXPOSE 3000
 
 # Comando para executar a aplicação
 CMD ["npm", "run", "dev"]
