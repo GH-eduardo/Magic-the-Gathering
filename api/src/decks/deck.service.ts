@@ -132,22 +132,47 @@ export class DecksService {
             throw new NotFoundException(`Commander with ID ${commanderId} not found.`);
         }
 
-        const cards = await this.cardModel.find({ id: { $in: cardsIds } });
+        const commanderColors = commander.color_identity.join('');
+        const cards: Card[] = [];
+    
+        for (const cardId of cardsIds) {
+            const existingCard = await this.cardModel.findOne({ id: cardId });
+    
+            if (existingCard) {
+                if (existingCard.color_identity.join('').includes(commanderColors)) {
+                    cards.push(existingCard);
+                } else {
+                    throw new ConflictException(`Card with ID ${cardId} does not match the commander's color identity.`);
+                }
+            } else {
+                const url = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardId)}`;
+                const response = await fetch(url);
+    
+                if (!response.ok) {
+                    throw new Error(`Error fetching card with ID ${cardId}: ${response.statusText}`);
+                }
+    
+                const cardData = await response.json();
+                const newCard = await this.mapToCard(cardData);
 
-        if (cards.length !== cardsIds.length) {
-            throw new NotFoundException(`Some cards with the provided IDs were not found.`);
+                if (newCard.color_identity.join('').includes(commanderColors)) {
+                    cards.push(newCard);
+                } else {
+                    throw new ConflictException(`Fetched card with ID ${cardId} does not match the commander's color identity.`);
+                }
+            }
         }
-
+    
         const importedDeck = new this.deckModel({
             name,
             description,
             commander,
             cards
         });
-
+    
         return importedDeck.save();
     }
-
+    
 
     private async generateCommander(commanderName: string): Promise<Card> {
         const url = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(commanderName)}`;
