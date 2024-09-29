@@ -52,7 +52,6 @@ export const useUsersStore = defineStore('user', () => {
     }
 
     async function getUserInformation() {
-        console.log("USER - " + user.value.id)
         if (!user.value.name) {
             const response = await fetch(`http://${import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_SERVER_PORT}/users/${user.value.id}`, {
                 headers: {
