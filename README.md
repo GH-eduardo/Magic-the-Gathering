@@ -21,6 +21,21 @@ Nossa prova prática consiste em uma aplicação web o qual os usuário podem ge
 
 A aplicação permite o fácil gerenciamento de decks, permitindo tanto a criação (com a escolha aleatória de cards), quanto também a importação e exportação de decks prontos. Para isso, foram implementadas as regras básicas desse modo de jogo, possibilitando que os decks possam ser utilizados em partidas reais.
 
+## Testes e2e e Testes de carga.
+
+A foi desenvolvido para a aplicação testes unitários que cobrem todos os controllers, services e repository da aplicação garantindo uma maior qualidade e controle durente o desenvolvimento do sistema.
+
+### Teste de carga sem cache
+Abaixo os testes de carga em requisições aos decks sem utilizar cache
+![image](https://github.com/user-attachments/assets/140e6fdf-38a0-495d-ba2b-8c751f1ff939)
+
+### Teste de carga com cache
+Abaixo os testes de carga em requisições aos decks utilizando cache
+![image](https://github.com/user-attachments/assets/003c2e6b-3d82-4872-84de-bf6eb5494479)
+
+Como pode ser observado nas comparações acima, sem a utilização de cache há uma perda considerável de desempenho na listagem de decks.
+Os testes foram realizados utilizando a ferramenta wrk com 67679 requisições.
+
 ## Tecnologias utilizadas
 
 - [Typescript](https://www.typescriptlang.org/)
@@ -79,7 +94,7 @@ Procure primeiro por um comandante, pois ele irá ditar quais cores suas outras 
 - Crie uma rota para listar somente os baralhos do jogador que está logado ✔️
 - Adicione cacheamento na rota de listar para listar todos os baralhos do jogador logado (Recomendação: https://docs.nestjs.com/techniques/caching) ✔️
 - Crie uma rota onde seja possível "importar" um baralho via json, e valide se esse baralho segue as regras do commander. ✔️
-- Realize os testes de performance e indique o comparativo de quantas vezes mais requisições e tempo de resposta você conseguiu atender utilizando a listagem de baralhos com cache e sem cache.
+- Realize os testes de performance e indique o comparativo de quantas vezes mais requisições e tempo de resposta você conseguiu atender utilizando a listagem de baralhos com cache e sem cache.✔️
 - (EXTRA) Utilize Clusters na sua aplicação e faça novos testes de performance e 
 demonstre os números obtidos.
 - (EXTRA) Utilizar Node.js streams para consumir a API de magic e também para consumir sua própria API.
