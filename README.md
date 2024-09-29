@@ -27,10 +27,12 @@ A foi desenvolvido para a aplicação testes unitários que cobrem todos os cont
 
 ### Teste de carga sem cache
 Abaixo os testes de carga em requisições aos decks sem utilizar cache
+
 ![image](https://github.com/user-attachments/assets/140e6fdf-38a0-495d-ba2b-8c751f1ff939)
 
 ### Teste de carga com cache
 Abaixo os testes de carga em requisições aos decks utilizando cache
+
 ![image](https://github.com/user-attachments/assets/003c2e6b-3d82-4872-84de-bf6eb5494479)
 
 Como pode ser observado nas comparações acima, sem a utilização de cache há uma perda considerável de desempenho na listagem de decks.
