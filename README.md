@@ -3,7 +3,7 @@
 Prova prática para a disciplina de Desafio Profissional VI do 6º semestre do curso de graduação de Engenharia de Software da Unicesumar.
 
 Desenvolvido por:
-- **Kauan Muriel Rossi (2214501-2)**
+- **Kauan Muriel Rossi (22014501-2)**
 - **Daniel Bonam Rissardi (22013838-2)**
 - **Eduardo Thomé (22110037-2)**
 - **Nathan Lisandro Toppa (22019971-2)**
