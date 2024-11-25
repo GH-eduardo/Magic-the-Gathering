@@ -9,11 +9,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Install dependencies and run API tests
+      - name: Install dependencies
         run: |
           cd api
           npm install
-#          npm test
 
   build_and_push_images:
     needs: application_tests
@@ -25,12 +24,12 @@ jobs:
       # Build API Docker Image
       - name: Build API Docker Image
         run: |
-          docker build -t magic-the-gathering-api ./api
+          docker build -t magic-the-gathering-api ./apps/api
 
       # Build Web Docker Image
       - name: Build Web Docker Image
         run: |
-          docker build -t magic-the-gathering-web ./web
+          docker build -t magic-the-gathering-web ./apps/web
 
       # Login to Docker Hub
       - name: Login to Docker Hub
