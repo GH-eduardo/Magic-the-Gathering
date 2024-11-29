@@ -1,6 +1,6 @@
 export interface ExportDeckDto {
     name: string;
     description: string;
-    commanderId: string;
-    cardsIds: string[];
+    commanderName: string;
+    cardsNames: string[];
 }
