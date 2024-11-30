@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
-import { Status } from './status.schema';
+import { Status } from 'src/decks/schemas/status.schema';
+import { Batch } from 'src/decks/schemas/batch.schema';
 
 export type ImportationDocument = HydratedDocument<Importation>;
 
@@ -14,8 +15,8 @@ export class Importation {
     @Prop()
     commanderName: string;
 
-    @Prop()
-    cards: [string];
+    @Prop({ type: [Batch] })
+    batches: Batch[];
 
     @Prop({ type: [{ generatedAt: Date, status: String, obs: String }] })
     status: Status[];

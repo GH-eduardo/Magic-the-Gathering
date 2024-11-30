@@ -13,6 +13,7 @@ import { UsersService } from "src/users/users.service";
 import { Role } from "src/users/enums/role.enum";
 import { Importation } from "./schemas/importation.schema";
 import { ImportationStatus } from "./enums/importation-status.enum";
+import { Batch } from "./schemas/batch.schema";
 
 @Injectable()
 export class DecksService {
@@ -23,6 +24,8 @@ export class DecksService {
         private cardModel: Model<Card>,
         @InjectModel(Importation.name)
         private importationModel: Model<Importation>,
+        @InjectModel(Batch.name)
+        private batchModel: Model<Batch>,
         private usersService: UsersService
     ) { }
 
@@ -92,7 +95,7 @@ export class DecksService {
             .populate('commander')
             .populate('owner')
             .exec();
-        
+
         return decks.map(deck => ({
             deckId: deck._id.toString(),
             name: deck.name,
@@ -142,7 +145,7 @@ export class DecksService {
         const cards: Card[] = [];
 
         //leva em torno de 10 segundos para importar o deck
-        for (let i= 0; i< cardsNames.length; i++) {
+        for (let i = 0; i < cardsNames.length; i++) {
             const response = await fetch(`https://api.scryfall.com/cards/named/?exact=${encodeURIComponent(cardsNames[i])}`);
             //50 milisegundos de delay para não sobrecarregar a API (pediram na doc)
             await new Promise(r => setTimeout(r, 50));
@@ -152,7 +155,7 @@ export class DecksService {
             }
             const cardData = await response.json();
             cards.push(await this.mapToCard(cardData))
-        } 
+        }
 
         const newStatus = {
             status: ImportationStatus.CREATED,
@@ -160,14 +163,36 @@ export class DecksService {
             obs: 'Initial validation was successful (valid commander and more 99 existing cards)'
         }
 
+        const newBatchStatus = {
+            status: ImportationStatus.CREATED,
+            generatedAt: new Date(),
+        }
+
+        const cardIds = cards.map(card => card.id);
+
+        const batch1 = { cards: cardIds.slice(0, 20), status: [newBatchStatus] };
+        const batch2 = { cards: cardIds.slice(20, 40), status: [newBatchStatus] };
+        const batch3 = { cards: cardIds.slice(40, 60), status: [newBatchStatus] };
+        const batch4 = { cards: cardIds.slice(60, 80), status: [newBatchStatus] };
+        const batch5 = { cards: cardIds.slice(80, 99), status: [newBatchStatus] };
+
+        const allBatches = [batch1, batch2, batch3, batch4, batch5];
+
         const newImportation = new this.importationModel({
             commanderName: commanderName,
-            cards: cardsNames,
+            batches: allBatches,
             status: [newStatus],
             owner: importDeckDto.ownerId
         });
 
         await newImportation.save();
+
+        newImportation.batches.forEach(async batch => {
+            const newBatch = new this.batchModel({
+                importationId: newImportation.id
+            });
+            await newBatch.save();
+        });
 
         const importedDeck = new this.deckModel({
             name: importDeckDto.name,
