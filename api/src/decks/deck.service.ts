@@ -11,6 +11,8 @@ import { ExportDeckDto } from "./dtos/export-deck.dto";
 import fetch from 'node-fetch';
 import { UsersService } from "src/users/users.service";
 import { Role } from "src/users/enums/role.enum";
+import { Importation } from "./schemas/importation.schema";
+import { ImportationStatus } from "./enums/importation-status.enum";
 
 @Injectable()
 export class DecksService {
@@ -19,6 +21,8 @@ export class DecksService {
         private deckModel: Model<Deck>,
         @InjectModel(Card.name)
         private cardModel: Model<Card>,
+        @InjectModel(Importation.name)
+        private importationModel: Model<Importation>,
         private usersService: UsersService
     ) { }
 
@@ -149,6 +153,21 @@ export class DecksService {
             const cardData = await response.json();
             cards.push(await this.mapToCard(cardData))
         } 
+
+        const newStatus = {
+            status: ImportationStatus.CREATED,
+            generatedAt: new Date(),
+            obs: 'Initial validation was successful (valid commander and more 99 existing cards)'
+        }
+
+        const newImportation = new this.importationModel({
+            commanderName: commanderName,
+            cards: cardsNames,
+            status: [newStatus],
+            owner: importDeckDto.ownerId
+        });
+
+        await newImportation.save();
 
         const importedDeck = new this.deckModel({
             name: importDeckDto.name,
