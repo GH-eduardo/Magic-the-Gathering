@@ -11,6 +11,9 @@ import { ExportDeckDto } from "./dtos/export-deck.dto";
 import fetch from 'node-fetch';
 import { UsersService } from "src/users/users.service";
 import { Role } from "src/users/enums/role.enum";
+import { Importation } from "src/decks/schemas/importation.schema";
+import { ImportationStatus } from "src/decks/enums/importation-status.enum";
+import { Batch } from "src/decks/schemas/batch.schema";
 
 @Injectable()
 export class DecksService {
@@ -19,6 +22,10 @@ export class DecksService {
         private deckModel: Model<Deck>,
         @InjectModel(Card.name)
         private cardModel: Model<Card>,
+        @InjectModel(Importation.name)
+        private importationModel: Model<Importation>,
+        @InjectModel(Batch.name)
+        private batchModel: Model<Batch>,
         private usersService: UsersService
     ) { }
 
@@ -88,7 +95,7 @@ export class DecksService {
             .populate('commander')
             .populate('owner')
             .exec();
-        
+
         return decks.map(deck => ({
             deckId: deck._id.toString(),
             name: deck.name,
@@ -121,37 +128,87 @@ export class DecksService {
         return {
             name: deck.name,
             description: deck.description,
-            commanderId: deck.commander.id,
-            cardsIds: deck.cards.map(card => card.id)
+            commanderName: deck.commander.name,
+            cardsNames: deck.cards.map(card => card.name)
         };
     }
 
-    async importDeck(importDeckDto: ImportDeckDto): Promise<Deck> {
-        const { name, description, commanderId, cardsIds } = importDeckDto;
-        console.log(name, description, commanderId, cardsIds)
+    async importDeck(importDeckDto: ImportDeckDto): Promise<{ message: string, deckId: string }> {
+        const { commanderName, cardsNames } = importDeckDto;
 
-        const commander = await this.cardModel.findOne({ _id: commanderId });
-        if (!commander) {
-            throw new NotFoundException(`Commander with ID ${commanderId} not found.`);
+        const commanderCard = await this.generateCommander(commanderName);
+
+        if (cardsNames.length !== 99) {
+            throw new Error(`The deck must have exactly 99 cards beyond the commander card, but ${cardsNames.length} were provided.`);
         }
 
-        const cards = await this.cardModel.find({ _id: { $in: cardsIds } });
+        const cards: Card[] = [];
 
-        if (cards.length !== cardsIds.length) {
-            throw new NotFoundException(`Some cards with the provided IDs were not found.`);
+        //leva em torno de 10 segundos para importar o deck
+        for (let i = 0; i < cardsNames.length; i++) {
+            const response = await fetch(`https://api.scryfall.com/cards/named/?exact=${encodeURIComponent(cardsNames[i])}`);
+            //50 milisegundos de delay para não sobrecarregar a API (pediram na doc)
+            await new Promise(r => setTimeout(r, 50));
+
+            if (!response.ok) {
+                throw new Error(`Error fetching cards: ${response.statusText}`);
+            }
+            const cardData = await response.json();
+            cards.push(await this.mapToCard(cardData))
         }
 
-        const owner = importDeckDto.ownerId;
+        const newStatus = {
+            status: ImportationStatus.CREATED,
+            generatedAt: new Date(),
+            observation: 'Initial validation was successful (valid commander and more 99 existing cards)'
+        }
 
-        const importedDeck = new this.deckModel({
-            name,
-            description,
-            commander,
-            cards,
-            owner
+        const newBatchStatus = {
+            status: ImportationStatus.CREATED,
+            generatedAt: new Date(),
+        }
+
+        const cardIds = cards.map(card => card.id);
+
+        const batch1 = { cards: cardIds.slice(0, 20), status: [newBatchStatus] };
+        const batch2 = { cards: cardIds.slice(20, 40), status: [newBatchStatus] };
+        const batch3 = { cards: cardIds.slice(40, 60), status: [newBatchStatus] };
+        const batch4 = { cards: cardIds.slice(60, 80), status: [newBatchStatus] };
+        const batch5 = { cards: cardIds.slice(80, 99), status: [newBatchStatus] };
+
+        const allBatches = [batch1, batch2, batch3, batch4, batch5];
+
+        const newImportation = new this.importationModel({
+            commanderName: commanderName,
+            status: [newStatus],
+            owner: importDeckDto.ownerId
         });
 
-        return importedDeck.save();
+        await newImportation.save();
+        const importationWithImportationIdAddedOnBatches = await this.importationModel.findById(newImportation.id);
+
+        for (let i = 0; i < allBatches.length; i++) {
+            const newBatch = new this.batchModel({
+                cards: allBatches[i].cards,
+                status: allBatches[i].status,
+                importationId: newImportation.id
+            });
+            await newBatch.save();
+            importationWithImportationIdAddedOnBatches.batches.push(newBatch);
+        }
+        await this.importationModel.findByIdAndUpdate(newImportation.id, importationWithImportationIdAddedOnBatches);
+
+        const importedDeck = new this.deckModel({
+            name: importDeckDto.name,
+            description: importDeckDto.description,
+            commander: commanderCard,
+            cards: cards,
+            owner: importDeckDto.ownerId
+        });
+
+        const savedDeck = await importedDeck.save();
+
+        return { message: "Deck imported successfully", deckId: savedDeck._id.toString() };
     }
 
 
@@ -160,13 +217,13 @@ export class DecksService {
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(`Erro ao buscar a carta: ${response.statusText}`);
+            throw new Error(`Error when searching the card: ${response.statusText}`);
         }
 
         const cardData = await response.json();
 
         if (cardData.legalities.commander !== 'legal') {
-            throw new Error(`A carta "${commanderName}" não é legal para ser usada como comandante.`);
+            throw new Error(`The card "${commanderName}" can't be used as a commander!`);
         }
 
         return this.mapToCard(cardData, true);

@@ -80,10 +80,10 @@ export class DecksController {
 
     @ApiOperation({ summary: 'import deck by providing a json object' })
     @Post('import')
-    async importDeck(@Req() request: Request, @Body() importDeckDto: ImportDeckDto): Promise<Deck> {
+    async importDeck(@Req() request: Request, @Body() importDeckDto: ImportDeckDto) {
         const requestUser = request['user'];
         importDeckDto.ownerId = requestUser.id;
 
-        return this.deckService.importDeck(importDeckDto);
+        return await this.deckService.importDeck(importDeckDto);
     }
 }
