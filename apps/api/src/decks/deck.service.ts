@@ -11,9 +11,9 @@ import { ExportDeckDto } from "./dtos/export-deck.dto";
 import fetch from 'node-fetch';
 import { UsersService } from "src/users/users.service";
 import { Role } from "src/users/enums/role.enum";
-import { Importation } from "./schemas/importation.schema";
-import { ImportationStatus } from "./enums/importation-status.enum";
-import { Batch } from "./schemas/batch.schema";
+import { Importation } from "src/decks/schemas/importation.schema";
+import { ImportationStatus } from "src/decks/enums/importation-status.enum";
+import { Batch } from "src/decks/schemas/batch.schema";
 
 @Injectable()
 export class DecksService {
@@ -160,7 +160,7 @@ export class DecksService {
         const newStatus = {
             status: ImportationStatus.CREATED,
             generatedAt: new Date(),
-            obs: 'Initial validation was successful (valid commander and more 99 existing cards)'
+            observation: 'Initial validation was successful (valid commander and more 99 existing cards)'
         }
 
         const newBatchStatus = {
@@ -180,19 +180,23 @@ export class DecksService {
 
         const newImportation = new this.importationModel({
             commanderName: commanderName,
-            batches: allBatches,
             status: [newStatus],
             owner: importDeckDto.ownerId
         });
 
         await newImportation.save();
+        const importationWithImportationIdAddedOnBatches = await this.importationModel.findById(newImportation.id);
 
-        newImportation.batches.forEach(async batch => {
+        for (let i = 0; i < allBatches.length; i++) {
             const newBatch = new this.batchModel({
+                cards: allBatches[i].cards,
+                status: allBatches[i].status,
                 importationId: newImportation.id
             });
             await newBatch.save();
-        });
+            importationWithImportationIdAddedOnBatches.batches.push(newBatch);
+        }
+        await this.importationModel.findByIdAndUpdate(newImportation.id, importationWithImportationIdAddedOnBatches);
 
         const importedDeck = new this.deckModel({
             name: importDeckDto.name,

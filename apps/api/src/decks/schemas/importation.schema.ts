@@ -18,7 +18,7 @@ export class Importation {
     @Prop({ type: [Batch] })
     batches: Batch[];
 
-    @Prop({ type: [{ generatedAt: Date, status: String, obs: String }] })
+    @Prop({ type: [{ generatedAt: Date, status: String, observation: String }] })
     status: Status[];
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
