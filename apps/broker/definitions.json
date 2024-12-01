@@ -1,0 +1,68 @@
+{
+  "rabbit_version": "3.6.3",
+  "users": [
+    {
+      "name": "magic_commander",
+      "password_hash": "oAMcOnBR4P/M4yhMHUAiEXMnD9RHS4np4yr/rSwjevA4wJc1",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "main-vhost"
+    }
+  ],
+  "permissions": [],
+  "parameters": [],
+  "policies": [],
+  "queues": [
+    {
+      "name": "magic-lotes-importacao",
+      "vhost": "main-vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "magic-notificacoes",
+      "vhost": "main-vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "magic_exchange",
+      "vhost": "main-vhost",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "magic_exchange",
+      "vhost": "main-vhost",
+      "destination": "magic-lotes-importacao",
+      "destination_type": "queue",
+      "routing_key": "lotes.importacao",
+      "arguments": {}
+    },
+    {
+      "source": "magic_exchange",
+      "vhost": "main-vhost",
+      "destination": "magic-notificacoes",
+      "destination_type": "queue",
+      "routing_key": "notificacoes",
+      "arguments": {}
+    }
+  ]
+}

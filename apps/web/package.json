@@ -1,5 +1,5 @@
 {
-  "name": "magic-the-gathering-web",
+  "name": "interface-magic-commander",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
