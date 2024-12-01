@@ -14,6 +14,7 @@ import { Role } from "src/users/enums/role.enum";
 import { Importation } from "src/decks/schemas/importation.schema";
 import { ImportationStatus } from "src/decks/enums/importation-status.enum";
 import { Batch } from "src/decks/schemas/batch.schema";
+import { ImportationMessagingService } from "src/importations/services/importation-messaging.service";
 
 @Injectable()
 export class DecksService {
@@ -26,7 +27,8 @@ export class DecksService {
         private importationModel: Model<Importation>,
         @InjectModel(Batch.name)
         private batchModel: Model<Batch>,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private importationMessagingService: ImportationMessagingService
     ) { }
 
     async create(createDeckDto: CreateDeckDto): Promise<{ message: string, deckId: string }> {
@@ -195,6 +197,7 @@ export class DecksService {
             });
             await newBatch.save();
             importationWithImportationIdAddedOnBatches.batches.push(newBatch);
+            await this.importationMessagingService.sendMessage(newBatch.id.toString());
         }
         await this.importationModel.findByIdAndUpdate(newImportation.id, importationWithImportationIdAddedOnBatches);
 
