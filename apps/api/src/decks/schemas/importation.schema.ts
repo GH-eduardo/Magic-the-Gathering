@@ -13,7 +13,7 @@ export class Importation {
     }
 
     @Prop()
-    commanderName: string;
+    commanderId: string;
 
     @Prop({ type: [Batch] })
     batches: Batch[];

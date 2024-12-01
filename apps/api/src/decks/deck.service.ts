@@ -179,7 +179,7 @@ export class DecksService {
         const allBatches = [batch1, batch2, batch3, batch4, batch5];
 
         const newImportation = new this.importationModel({
-            commanderName: commanderName,
+            commanderId: commanderCard.id,
             status: [newStatus],
             owner: importDeckDto.ownerId
         });
