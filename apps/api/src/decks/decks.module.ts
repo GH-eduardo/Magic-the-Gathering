@@ -7,6 +7,7 @@ import { DecksService } from './deck.service';
 import { UsersModule } from 'src/users/users.module';
 import { Importation, ImportationSchema } from './schemas/importation.schema';
 import { Batch, BatchSchema } from './schemas/batch.schema';
+import { ImportationsModule } from 'src/importations/importations.module';
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { Batch, BatchSchema } from './schemas/batch.schema';
             { name: Importation.name, schema: ImportationSchema },
             { name: Batch.name, schema: BatchSchema }
         ]),
-        UsersModule
+        UsersModule,
+        ImportationsModule
     ],
     controllers: [DecksController],
     providers: [DecksService]
