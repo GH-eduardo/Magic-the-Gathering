@@ -9,7 +9,7 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: ['amqp://magic_commander:am9jen7ac011@localhost:5672/main-vhost'],
-        queue: 'magic-lotes-importacao',
+        queue: 'magic-notificacoes',
       }
     }
   );
