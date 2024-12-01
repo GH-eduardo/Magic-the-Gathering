@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { env } from 'process';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ImportationsModule } from './importations/importations.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { CacheModule } from '@nestjs/cache-manager';
     CacheModule.register({ isGlobal: true }),
     DecksModule,
     AuthModule,
-    UsersModule],
+    UsersModule,
+    ImportationsModule],
   controllers: [AppController],
   providers: [AppService],
 })
