@@ -13,7 +13,15 @@
       "name": "main-vhost"
     }
   ],
-  "permissions": [],
+  "permissions": [
+    {
+      "user": "magic_commander",
+      "vhost": "main-vhost",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
   "parameters": [],
   "policies": [],
   "queues": [
