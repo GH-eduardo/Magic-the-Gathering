@@ -14,5 +14,11 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo clean"
+  },
+  "dependencies": {
+    "@nestjs-plus/rabbitmq": "^1.4.4",
+    "@nestjs/platform-socket.io": "^10.4.12",
+    "@nestjs/websockets": "^10.4.12",
+    "amqplib": "^0.10.5"
   }
 }
