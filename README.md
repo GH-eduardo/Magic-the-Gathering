@@ -59,21 +59,13 @@ Abaixo as funcionalidades desenvolvidas.
 
 - Autenticação
     - O sistema conta com uma autenticação, onde para realizar ações relevantes na aplicação é necessário que o usuário esteja tenha criado uma conta válida e esteja logado ao sistema.
-- Carteira do usuário
-    - Os usuários possuem uma carteira própria onde podem depositar ou sacar dinheiro. Os usuários utilizam a carteira para comprar novos tokens ou ganhar dinheiro por meio da venda dos mesmos.
-- Preferencias
-    - Ao realizar a criação da sua conta, o usuario pode selecionar seu personagem, criador e revista preferidos, os quais devem ser cadastrados pelo administrador do sistema, entretanto não influenciam a geração de tokens.
-- Minerar tokens
-    - O usuário faz uma requisição para a rota de mineração e recebe como retorno um token como recompensa de seu esforço.
-    - Cada token é unico, o mesmo é gerado por meio da API da marvel.
-    - O token gerado é armazenado no banco de dados e atrelado ao usuário que o minerou.
-- Marketplace de tokens
-    - O usuário é capaz de anunciar os seus tokens em um marketplace onde outros usuários podem compra-lo.
-    - O anuncio possui um valor fixo com valor definido.
-    - O usuário é capaz de adquirir novos tokens por meio de seu dinheiro na plataforma.
-- Obter detalhes do conteúdo do token
-    - O usuário pode visualizar os detalhes de um tokens.
-    - Os dados podem ser do seu token ou de tokens de outros usuários.
+- Autorização
+    - O sistema conta com uma autorização, onde somente usuários privilegiados podem fazer uso de certas rotas
+- Criar Decks
+    - O sistema permite criar decks gerados aleatoriamente
+- Exportar Decks
+- Importar Decks
+
 
 ## Escopo do projeto - Solicitação do professor.
 
@@ -101,3 +93,27 @@ Procure primeiro por um comandante, pois ele irá ditar quais cores suas outras 
 demonstre os números obtidos.
 - (EXTRA) Utilizar Node.js streams para consumir a API de magic e também para consumir sua própria API.
 - (EXTRA) Front-end ✔️
+
+### Segunda Parte
+
+### Mensageria
+Mensageria refere-se ao uso de sistemas de troca de mensagens entre diferentes componentes ou serviços de uma aplicação. Em arquiteturas modernas, especialmente em sistemas distribuídos e de microserviços, a mensageria facilita a comunicação assíncrona, permitindo que diferentes partes da aplicação interajam de forma eficiente e escalável.
+
+Proposta
+### Utilizando a API de magic construida no bimestre passado, faça as seguintes alterações/funcionalidades
+
+- Implemente um sistema de notificações que informe os usuários sobre atualizações nos baralhos, como adição de novas cartas ou modificações. Isso pode ser feito emitindo mensagens através do RabbitMQ ou Kafka que sejam consumidas por uma aplicação de frontend para exibir notificações instantâneas (frontend opcional).
+
+- Implemente a funcionalidade de importação de baralhos de forma assíncrona, utilizando RabbitMQ para gerenciamento de filas e WebSockets para notificações em tempo real aos usuários sobre o status da importação.
+EX:
+
+    - O usuário faz uma requisição para importar um baralho
+A API recebe a requisição, valida os dados e salva as informações iniciais do baralho no banco de dados.
+Em seguida, a API envia uma mensagem para a fila deck_import_queue no RabbitMQ,/Kafka contendo os detalhes do baralho a ser importado.✔️
+Um worker dedicado está escutando a fila deck_import_queue.
+Ao receber uma mensagem, o worker processa a importação do baralho, realizando todas as operações necessárias, como validação adicional, integração com outros serviços ou persistência final no banco de dados.✔️
+Após concluir o processamento, o worker envia uma mensagem para a fila deck_updates_queue.
+Outro worker, responsável por gerenciar notificações, consome essa mensagem e utiliza WebSockets✔️ (por exemplo, com Socket.IO) para emitir um evento de atualização para o cliente conectado.
+O frontend, por sua vez, ouve esse evento e atualiza a interface do usuário em tempo real, informando sobre a conclusão da importação.
+- Implemente filas de tarefas com diferentes prioridades para garantir que operações críticas sejam tratadas com maior prioridade. Por exemplo, operações de autenticação podem ter prioridade mais alta em relação a atualizações de baralhos, no nosso caso, usuários autenticados e com permissão de ADM tem prioridade sobre usuários normais.
+- Extra: Configure o envio de métricas e eventos para uma ferramenta de monitoramento (como Prometheus ou Grafana) através de mensagens. Isso permite a criação de dashboards em tempo real e configurações de alertas para eventos críticos no sistema.✔️
