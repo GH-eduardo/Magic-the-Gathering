@@ -1,18 +1,16 @@
-import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseInterceptors, UseGuards, Inject } from '@nestjs/common';
+import { Bind, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseInterceptors, UseGuards } from '@nestjs/common';
 import { DecksService } from './deck.service';
 import { CreateDeckDto } from './dtos/create-deck.dto';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateDeckDto } from './dtos/update-deck.dto';
 import { DetailsDeckDto } from './dtos/details-deck.dto';
 import { ListDecksDto } from './dtos/list-decks.dto';
-import { ImportDeckDto } from './dtos/import-deck.dto';
 import { ExportDeckDto } from './dtos/export-deck.dto';
 import { Request, Response } from 'express';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Roles } from 'src/auth/cross-cutting/decorators/roles.decorator';
 import { Role } from 'src/users/enums/role.enum';
 import { RolesGuard } from 'src/auth/cross-cutting/guards/roles.guard';
-import { ImportationMessagingService } from 'src/importations/services/importation-messaging.service';
 
 @ApiBearerAuth()
 @ApiTags('decks')
@@ -20,8 +18,6 @@ import { ImportationMessagingService } from 'src/importations/services/importati
 @Controller('decks')
 export class DecksController {
     constructor(
-        @Inject()
-        private importationMessagingService: ImportationMessagingService,
         private deckService: DecksService) { }
 
     @ApiOperation({ summary: 'lists all decks of one user' })
@@ -78,14 +74,5 @@ export class DecksController {
     @Bind(Param('id'))
     async exportDeck(id: string): Promise<ExportDeckDto> {
         return this.deckService.exportDeck(id);
-    }
-
-    @ApiOperation({ summary: 'import deck by providing a json object' })
-    @Post('import')
-    async importDeck(@Req() request: Request, @Body() importDeckDto: ImportDeckDto) {
-        const requestUser = request['user'];
-        importDeckDto.ownerId = requestUser.id;
-
-        return await this.deckService.importDeck(importDeckDto);
     }
 }

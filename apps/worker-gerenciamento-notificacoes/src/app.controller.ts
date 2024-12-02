@@ -6,9 +6,9 @@ import { MessagePattern } from '@nestjs/microservices';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @MessagePattern('notificacoes')
+  accumulate(data: any): void {
+    this.appService.onModuleInit();
   }
 
   @MessagePattern('notificacoes')

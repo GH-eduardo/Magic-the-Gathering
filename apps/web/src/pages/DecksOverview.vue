@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import router from "@/router";
 import { useDecksStore } from "@/stores/decks/decks.store";
-import { DeckExportDto } from "@/stores/decks/dto/deck-export.dto";
 import { DeckOverview } from "@/stores/decks/dto/deck-overview.dto";
 import { ref } from "vue";
 
