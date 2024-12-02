@@ -99,6 +99,8 @@ demonstre os números obtidos.
 ### Mensageria
 Mensageria refere-se ao uso de sistemas de troca de mensagens entre diferentes componentes ou serviços de uma aplicação. Em arquiteturas modernas, especialmente em sistemas distribuídos e de microserviços, a mensageria facilita a comunicação assíncrona, permitindo que diferentes partes da aplicação interajam de forma eficiente e escalável.
 
+![image](https://github.com/GH-eduardo/Magic-the-Gathering/blob/main/docs/arquitetura-mensageria-magic.png)
+
 Proposta
 ### Utilizando a API de magic construida no bimestre passado, faça as seguintes alterações/funcionalidades
 
