@@ -11,10 +11,6 @@ async function bootstrap() {
     origin: 'http://localhost:3000', credentials: true
   })
 
-  app.enableCors({
-    origin: 'http://magic-the-gathering-web:3000', credentials: true
-  })
-
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Magic Commander Decks')
     .setDescription('The magic commander decks manager')

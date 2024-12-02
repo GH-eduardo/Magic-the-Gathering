@@ -1,29 +1,34 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
-import { Status } from 'src/decks/schemas/status.schema';
-import { Batch } from 'src/decks/schemas/batch.schema';
+import { ImportDeckBatch } from './import-deck-batch.schema';
 
-export type ImportationDocument = HydratedDocument<Importation>;
+export type ImportDeckDocument = HydratedDocument<ImportDeck>;
 
 @Schema()
-export class Importation {
+export class ImportDeck {
     get id() {
         return this.id
     }
 
     @Prop()
+    name: string;
+
+    @Prop()
+    description: string;
+
+    @Prop()
     commanderName: string;
 
-    @Prop({ type: [Batch] })
-    batches: Batch[];
+    @Prop({ type: [ImportDeckBatch] })
+    batches: ImportDeckBatch[];
 
     @Prop({ type: [{ generatedAt: Date, status: String, observation: String }] })
-    status: Status[];
+    status: ImportDeck[];
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     owner: User;
 
 }
 
-export const ImportationSchema = SchemaFactory.createForClass(Importation);
+export const ImportDeckSchema = SchemaFactory.createForClass(ImportDeck);

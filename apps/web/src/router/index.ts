@@ -22,6 +22,8 @@ const router = createRouter({
         { path: 'home', name: 'home', component: Home },
         { path: 'decks', name: 'decks', component: DecksOverview },
         { path: 'decks/:id', component: DeckDetails },
+        { path: 'imports', component: DeckDetails },
+        { path: 'imports/:id', component: DeckDetails },
         { path: 'cards', name: 'cards', component: Cards }
       ],
     },

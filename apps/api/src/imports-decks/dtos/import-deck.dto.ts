@@ -4,6 +4,12 @@ import mongoose from "mongoose";
 export class ImportDeckDto {
 
     @ApiProperty({
+        description: "unique identifier of the import deck",
+        example: '245'
+    })
+    id: string;
+
+    @ApiProperty({
         description: 'name/title of the deck',
         example: 'Deck importado',
     })
