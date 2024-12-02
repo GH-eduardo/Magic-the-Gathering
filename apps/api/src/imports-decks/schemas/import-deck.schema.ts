@@ -18,7 +18,7 @@ export class ImportDeck {
     description: string;
 
     @Prop()
-    commanderName: string;
+    commanderId: string;
 
     @Prop({ type: [ImportDeckBatch] })
     batches: ImportDeckBatch[];

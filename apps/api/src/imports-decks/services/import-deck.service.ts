@@ -10,6 +10,7 @@ import { ImportDeck } from "../schemas/import-deck.schema";
 import { ImportDeckBatch } from "../schemas/import-deck-batch.schema";
 import { UsersService } from "src/users/users.service";
 import { Role } from "src/users/enums/role.enum";
+import { ImportationMessagingService } from '../services/messaging-import-deck.service';
 
 @Injectable()
 export class ImportDeckService {
@@ -21,7 +22,8 @@ export class ImportDeckService {
         @InjectModel(ImportDeckBatch.name)
         private importDeckBatchModel: Model<ImportDeckBatch>,
         private decksService: DecksService,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private importationMessagingService: ImportationMessagingService
     ) { }
 
     async importDeck(importDeckDto: ImportDeckDto): Promise<{ deckId: string }> {
@@ -70,7 +72,7 @@ export class ImportDeckService {
         const allBatches = [batch1, batch2, batch3, batch4, batch5];
 
         const newImportation = new this.importDeckModel({
-            commanderName: commanderName,
+            commanderId: commanderCard.id,
             status: [newStatus],
             owner: importDeckDto.ownerId
         });
@@ -86,6 +88,7 @@ export class ImportDeckService {
             });
             await newBatch.save();
             importationWithImportationIdAddedOnBatches.batches.push(newBatch);
+            await this.importationMessagingService.sendMessage(newBatch.id.toString());
         }
         await this.importDeckModel.findByIdAndUpdate(newImportation.id, importationWithImportationIdAddedOnBatches);
 
@@ -111,7 +114,7 @@ export class ImportDeckService {
 
         return importsDecks.map(importDeck => ({
             id: importDeck.id,
-            commanderName: importDeck.commanderName,
+            commanderName: importDeck.commanderId,
             name: importDeck.name,
             description: importDeck.description,
             ownerId: user.id,
