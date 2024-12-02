@@ -11,7 +11,9 @@ services:
       - ${DATABASE_PORT}:27017
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: magic-rabbitmq
+    build:
+      context: ./apps/broker
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
@@ -23,6 +25,7 @@ services:
       - "15692:15692"
     env_file:
       - .env
+    hostname: magic-rabbitmq
     command: >
       sh -c "rabbitmq-plugins enable rabbitmq_prometheus && rabbitmq-server"
 
