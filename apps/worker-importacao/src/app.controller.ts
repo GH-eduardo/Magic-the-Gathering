@@ -6,13 +6,8 @@ import { MessagePattern } from '@nestjs/microservices';
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
   @MessagePattern('lotes.importacao')
-  accumulate(data: any): void {
-    console.log(data)
+  async accumulate(batchId: string): Promise<void> {
+    await this.appService.validateBatch(batchId);
   }
 }
