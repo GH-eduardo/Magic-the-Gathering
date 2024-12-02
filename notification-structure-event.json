@@ -1,0 +1,15 @@
+{
+    "id": "string",            
+    "type": "string",             
+    "deckId": "string",           
+    "message": "string",        
+    "timestamp": "string",        
+    "userId": "string",           
+    "source": "string",           
+    "priority": "string",         
+    "status": "string",           
+    "metadata": {                
+      "key1": "value1",
+      "key2": "value2"
+    }
+  }
